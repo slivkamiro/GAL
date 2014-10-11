@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <!-- Properties -->
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
+  <key id="since" for="edge" attr.name="since" attr.type="int"/>
+  <!-- Graph -->
+  <graph id="G" edgedefault="directed">
+    <!-- Vertices -->
+    <node id="1">
+      <data key="name">Benny</data>
+    </node>
+    <node id="2">
+      <data key="name">Daniel</data>
+    </node>
+    <node id="3">
+      <data key="name">Robert</data>
+    </node>
+    <node id="4">
+      <data key="name">Jan</data>
+    </node>
+    <node id="5">
+      <data key="name">Melanie</data>
+    </node>
+    <node id="6">
+      <data key="name">Julia</data>
+    </node>
+    <node id="7">
+      <data key="name">Josefine</data>
+    </node>
+    <node id="8">
+      <data key="name">Kristin</data>
+    </node>
+    <!-- Edges -->
+    <edge id="9" source="1" target="5" label="knows">
+      <data key="since">2008</data>
+    </edge>
+    <edge id="10" source="2" target="6" label="knows" >
+      <data key="since">2011</data>
+    </edge>
+    <edge id="11" source="3" target="7" label="knows">
+      <data key="since">2010</data>
+    </edge>
+    <edge id="12" source="4" target="8" label="knows">
+      <data key="since">2009</data>
+    </edge>
+    <edge id="13" source="2" target="5" label="knows">
+      <data key="since">2011</data>
+    </edge>
+    <edge id="14" source="8" target="1" label="knows">
+      <data key="since">2010</data>
+    </edge>
+  </graph>
+</graphml>
