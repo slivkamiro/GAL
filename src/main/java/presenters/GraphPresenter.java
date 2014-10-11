@@ -1,8 +1,12 @@
 package presenters;
 
 import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.List;
 
-import model.Graph;
+import model.Edge;
 import model.Vertex;
 
 public class GraphPresenter extends Presenter {
@@ -13,8 +17,9 @@ public class GraphPresenter extends Presenter {
 		public void drawDirectedEdge(Point p1, Point p2);
 		public void editObjectColseTo(Point p);
 		public void removeLast();
-		public void removeObjectCloseTo(Point p);
+		public void removeObjectsCloseTo(Point p);
 		public void moveVertex(Point p);
+		public List<Shape> getObjects();
 	}
 	
 	public enum EditorOptions {
@@ -29,13 +34,10 @@ public class GraphPresenter extends Presenter {
 	
 	private EditorOptions mode = EditorOptions.NONE;
 	
-	private Graph graph;
-	
 	private Point start;
 	private Point end;
 	
 	public GraphPresenter() {
-		graph = new Graph("new");
 	}
 	
 	public void setView(GraphEditor editor) {
@@ -55,16 +57,6 @@ public class GraphPresenter extends Presenter {
 				editor.drawEdge(getTouchPoint(out,start), getTouchPoint(in,end));
 			}
 			break;
-		case EDIT:
-			// TODO: update model
-			// TODO: get object from model with coords specified
-			this.populateDialog(Presenter.Dialogs.EDIT_VERTEX);
-			editor.editObjectColseTo(point);
-			break;
-		case REMOVE:
-			// TODO: update model
-			editor.removeObjectCloseTo(point);
-			break;
 		case VERTEX:
 			// add vertex to model
 			Vertex v = graph.addVertex();
@@ -73,6 +65,8 @@ public class GraphPresenter extends Presenter {
 			// draw vertex to canvas
 			editor.drawVertex(point);
 			break;
+		case EDIT:
+		case REMOVE:
 		case NONE:
 			break;
 		}
@@ -80,6 +74,7 @@ public class GraphPresenter extends Presenter {
 	}
 
 	public void startPoint(Point point) {
+		Vertex v = null;
 		switch(mode) {
 		case EDGE:
 			start = point;
@@ -87,12 +82,57 @@ public class GraphPresenter extends Presenter {
 			editor.drawEdge(start, end);
 			break;
 		case EDIT:
+			// TODO: update model
+			v = graph.getVertexOnPosition(point);
+			if(v != null) {
+				this.populateDialog(Presenter.Dialogs.EDIT_VERTEX,v);
+				editor.editObjectColseTo(point);
+				break;
+			}
+			Edge e = getEdgeCloseTo(point);
+			if(e != null) {
+				this.populateDialog(Presenter.Dialogs.EDIT_EDGE, e);
+				editor.editObjectColseTo(point);
+			}
+			break;
 		case REMOVE:
+			v = graph.getVertexOnPosition(point);
+			if(v != null) {
+				graph.removeVertex(v);
+				editor.removeObjectsCloseTo(point);
+			}
+			break;
 		case VERTEX:
 		case NONE:
 			break;
 		}
 		
+	}
+
+	private Edge getEdgeCloseTo(Point point) {
+		Point2D p1 = null, p2 = null;
+		for(Shape s : editor.getObjects()) {
+			if(s instanceof Line2D) {
+				if(Line2D.ptLineDist(((Line2D) s).getX1(), ((Line2D) s).getY1(),
+						((Line2D) s).getX2(), ((Line2D) s).getY2(), point.x, point.y) < 10.0) {
+					p1 = ((Line2D) s).getP1();
+					p2 = ((Line2D) s).getP2();
+					break;
+				}
+			}
+		}
+		
+		if(p1 == null || p2 == null )
+			return null;
+		
+		Vertex v1 = graph.getVertexOnPosition(p1);
+		Vertex v2 = graph.getVertexOnPosition(p2);
+		
+		Edge e = null;
+		if((e = graph.getEdge(v1,v2)) == null)
+			e = graph.getEdge(v2,v1);
+		
+		return e;
 	}
 
 	public void setEditor(EditorOptions mode) {
@@ -110,6 +150,7 @@ public class GraphPresenter extends Presenter {
 			}
 			break;
 		case EDIT:
+			// TODO: drag vertex, together with edges
 		case REMOVE:
 		case VERTEX:
 		case NONE:

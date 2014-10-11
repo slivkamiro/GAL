@@ -39,4 +39,8 @@ public class Vertex {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public Map<String,String> getAttributes() {
+		return attributes;
+	}
 }

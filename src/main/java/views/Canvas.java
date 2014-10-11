@@ -121,13 +121,51 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 		
 	}
 
-	public void removeObjectCloseTo(Point p) {
-		// TODO Auto-generated method stub
+	// This is kind of heavy computation for view, isnt't it?
+	public void removeObjectsCloseTo(Point p) {
+		Ellipse2D vertex = null;
+		// find vertex at first
+		for(Shape s : objects) {
+			if(s instanceof Ellipse2D) {
+				vertex = (Ellipse2D) s;
+				if(Math.pow(p.x-vertex.getCenterX(),2)+
+						Math.pow(p.y-vertex.getCenterY(), 2) < 100) {
+					break;
+				}
+				vertex = null;
+			}
+		}
+		if(vertex == null) {
+			return;
+		}
+		// find lines whose some end is touching this ellipse
+		List<Line2D> lines = new ArrayList<Line2D>();
+		for(Shape s : objects) {
+			if(s instanceof Line2D) {
+				Line2D l = (Line2D) s;
+				// (x-x0)^2+(y-y0)^2 <= r^2
+				// there could be some edges left when the touch point was rounded
+				if( (Math.pow(l.getX1()-vertex.getCenterX(),2)+
+						Math.pow(l.getY1()-vertex.getCenterY(), 2) <= 100) ||
+						(Math.pow(l.getX2()-vertex.getCenterX(),2)+
+						Math.pow(l.getY2()-vertex.getCenterY(), 2) <= 100)) {
+							lines.add(l);
+						}
+					
+			}
+		}
+		objects.remove(vertex);
+		objects.removeAll(lines);
 		
+		repaint();
 	}
 
 	public void moveVertex(Point x) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public List<Shape> getObjects() {
+		return objects;
 	}
 }

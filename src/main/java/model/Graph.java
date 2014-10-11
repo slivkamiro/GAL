@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +45,29 @@ public class Graph {
 		for(Vertex v : vertices) {
 			int x = Integer.parseInt(v.getAttribute("PositionX"));
 			int y = Integer.parseInt(v.getAttribute("PositionY"));
-			if((p.x >= x-20 && p.x <= x+20) &&
-					(p.y >= y-20 && p.y <= y+20))
+			// some deviation given
+			if(Math.pow(p.x-x,2)+Math.pow(p.y-y, 2) <= 110)
 				return v;
+		}
+		return null;
+	}
+
+	public void removeVertex(Vertex v) {
+		vertices.remove(v);
+		
+	}
+
+	public Vertex getVertexOnPosition(Point2D point) {
+		Point p = new Point();
+		p.x = (int)point.getX();
+		p.y = (int)point.getY();
+		return getVertexOnPosition(p);
+	}
+
+	public Edge getEdge(Vertex v1, Vertex v2) {
+		for(Edge e : edges) {
+			if(e.getOutVertex() == v1 && e.getInVertex() == v2) 
+				return e;
 		}
 		return null;
 	}
