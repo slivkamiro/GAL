@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -20,6 +19,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import presenters.DemoPresenter;
 import presenters.DemoPresenter.Demonstrator;
 import presenters.GraphPresenter;
+import utils.MyButtonGroup;
 
 public class MainWindow extends JApplet implements Demonstrator {
 
@@ -116,7 +116,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		});
 		toolBar.add(tglbtnRemove);
 		
-		ButtonGroup eGrp = new ButtonGroup();
+		MyButtonGroup eGrp = new MyButtonGroup();
 		eGrp.add(tglbtnVertex);
 		eGrp.add(tglbtnEdge);
 		eGrp.add(tglbtnEdit);
