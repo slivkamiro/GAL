@@ -16,7 +16,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
-import model.Vertex;
+import model.VertexAdapter;
 import presenters.EditVertexPresenter;
 import presenters.EditVertexPresenter.VertexEditor;
 
@@ -138,7 +138,7 @@ public class EditVertex extends JDialog implements VertexEditor {
 		}
 	}
 
-	public void showVertexProp(Vertex v) {
+	public void showVertexProp(VertexAdapter v) {
 		txtfldID.setText(v.getId());
 		DefaultListModel<String> m = new DefaultListModel<String>();
 		for(String key : v.getAttributes().keySet()) {

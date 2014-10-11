@@ -14,10 +14,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import model.Edge;
+import model.EdgeAdapter;
 import presenters.EditEdgePresenter;
 import presenters.EditEdgePresenter.EdgeEditor;
-import presenters.EditVertexPresenter;
 
 public class EditEdge extends JDialog implements EdgeEditor {
 
@@ -82,8 +81,8 @@ public class EditEdge extends JDialog implements EdgeEditor {
 		}
 	}
 
-	public void showEdgeProp(Edge e) {
-		spWeight.setValue(e.getWeight());
+	public void showEdgeProp(EdgeAdapter e) {
+		spWeight.setValue(Integer.parseInt(e.getWeight()));
 		
 	}
 }

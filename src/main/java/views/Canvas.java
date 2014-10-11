@@ -122,7 +122,7 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 	}
 
 	// This is kind of heavy computation for view, isnt't it?
-	public void removeObjectsCloseTo(Point p) {
+	public void removeVertexCloseTo(Point p) {
 		Ellipse2D vertex = null;
 		// find vertex at first
 		for(Shape s : objects) {
@@ -156,6 +156,21 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 		}
 		objects.remove(vertex);
 		objects.removeAll(lines);
+		
+		repaint();
+	}
+	
+	public void removeEdgeCloseTo(Point p) {
+		for(Shape s : objects) {
+			if(s instanceof Line2D) {
+				if(Line2D.ptLineDist(((Line2D) s).getX1(), ((Line2D) s).getY1(),
+						((Line2D) s).getX2(), ((Line2D) s).getY2(), p.x, p.y) < 10.0) {
+							objects.remove(s);
+							break;
+						}
+					
+			}
+		}
 		
 		repaint();
 	}

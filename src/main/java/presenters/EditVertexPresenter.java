@@ -1,22 +1,22 @@
 package presenters;
 
-import model.Vertex;
+import model.VertexAdapter;
 
 public class EditVertexPresenter extends Presenter {
 	
 	public interface VertexEditor {
-		public void showVertexProp(Vertex v);
+		public void showVertexProp(VertexAdapter v);
 		
 	}
 	
 	private VertexEditor editor;
-	private Vertex vertex;
+	private VertexAdapter vertex;
 	
 	public void setView(VertexEditor view) {
 		editor = view;
 	}
 
-	public void setVertex(Vertex o) {
+	public void setVertex(VertexAdapter o) {
 		vertex = o;		
 	}
 	
