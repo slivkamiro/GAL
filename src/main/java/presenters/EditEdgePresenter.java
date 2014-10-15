@@ -22,6 +22,11 @@ public class EditEdgePresenter extends Presenter {
 	public void show() {
 		editor.showEdgeProp(edge);
 	}
+
+	public void setWeight(String w) {
+		edge.setWeight(w);
+		
+	}
 	
 
 }

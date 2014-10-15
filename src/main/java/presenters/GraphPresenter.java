@@ -9,19 +9,21 @@ import java.util.List;
 import model.EdgeAdapter;
 import model.GraphAdapter;
 import model.VertexAdapter;
+import views.CanvasObject;
 
 public class GraphPresenter extends Presenter {
 	
 	public interface GraphEditor {
-		public void drawVertex(Point p);
-		public void drawEdge(Point x, Point y);
-		public void drawDirectedEdge(Point p1, Point p2);
-		public void editObjectColseTo(Point p);
+		public void drawObject(CanvasObject o);
+		public void drawShape(final Shape s);
+		//public void drawDirectedEdge(Point p1, Point p2);
+		public void editObject(CanvasObject o);
+		public void removeObjectCloseTo(Point p);
 		public void removeLast();
-		public void removeVertexCloseTo(Point p);
-		public void removeEdgeCloseTo(Point p);
+		//public void removeVertexCloseTo(Point p);
+		//public void removeEdgeCloseTo(Point p);
 		public void moveVertex(Point p);
-		public List<Shape> getObjects();
+		public List<CanvasObject> getObjects();
 	}
 	
 	public enum EditorOptions {
@@ -59,8 +61,9 @@ public class GraphPresenter extends Presenter {
 			VertexAdapter in = getVertexOnPosition(end);
 			editor.removeLast();
 			if(out != null && in != null) {
-				graph.addEdge(out, in);
-				editor.drawEdge(getTouchPoint(out,start), getTouchPoint(in,end));
+				EdgeAdapter e = graph.addEdge(out, in);
+				e.setPoints(getTouchPoint(out,start), getTouchPoint(in,end));
+				editor.drawObject(e);
 			}
 			break;
 		case VERTEX:
@@ -69,7 +72,7 @@ public class GraphPresenter extends Presenter {
 			v.setAttribute("PositionX", String.valueOf(point.x));
 			v.setAttribute("PositionY", String.valueOf(point.y));
 			// draw vertex to canvas
-			editor.drawVertex(point);
+			editor.drawObject(v);
 			break;
 		case EDIT:
 		case REMOVE:
@@ -86,33 +89,36 @@ public class GraphPresenter extends Presenter {
 		case EDGE:
 			start = point;
 			end = point;
-			editor.drawEdge(start, end);
+			editor.drawShape(new Line2D.Double(start, end));
 			break;
 		case EDIT:
-			// TODO: update model
 			v = getVertexOnPosition(point);
 			if(v != null) {
 				this.populateDialog(Presenter.Dialogs.EDIT_VERTEX,v);
-				editor.editObjectColseTo(point);
+				editor.editObject(v);
 				break;
 			}
 			e = getEdgeCloseTo(point);
 			if(e != null) {
 				this.populateDialog(Presenter.Dialogs.EDIT_EDGE, e);
-				editor.editObjectColseTo(point);
+				editor.editObject(e);
 			}
 			break;
 		case REMOVE:
 			v = getVertexOnPosition(point);
-			if(v != null) {
+			if(v != null && v.getEdges().size() == 0) {
 				graph.removeVertex(v);
-				editor.removeVertexCloseTo(point);
+				editor.removeObjectCloseTo(point);
+				break;
+			} else if(v != null && v.getEdges().size() != 0) {
+				// For simplicity user have to remove edges first
+				this.populateDialog(Presenter.Dialogs.MESSAGE, "First remove edges!");
 				break;
 			}
 			e = getEdgeCloseTo(point);
 			if(e != null) {
 				graph.removeEdge(e);
-				editor.removeEdgeCloseTo(point);
+				editor.removeObjectCloseTo(point);
 			}
 			break;
 		case VERTEX:
@@ -124,12 +130,11 @@ public class GraphPresenter extends Presenter {
 
 	private EdgeAdapter getEdgeCloseTo(Point point) {
 		Point2D p1 = null, p2 = null;
-		for(Shape s : editor.getObjects()) {
-			if(s instanceof Line2D) {
-				if(Line2D.ptLineDist(((Line2D) s).getX1(), ((Line2D) s).getY1(),
-						((Line2D) s).getX2(), ((Line2D) s).getY2(), point.x, point.y) < 10.0) {
-					p1 = ((Line2D) s).getP1();
-					p2 = ((Line2D) s).getP2();
+		for(CanvasObject o : editor.getObjects()) {
+			if(o instanceof EdgeAdapter) {
+				if(((EdgeAdapter) o).contains(point)) {
+					p1 = ((Line2D)((EdgeAdapter) o).getShape()).getP1();
+					p2 = ((Line2D)((EdgeAdapter) o).getShape()).getP2();
 					break;
 				}
 			}
@@ -162,7 +167,7 @@ public class GraphPresenter extends Presenter {
 			VertexAdapter out = getVertexOnPosition(start);
 			if(out != null) {
 				editor.removeLast();
-				editor.drawEdge(getTouchPoint(out,start), end);
+				editor.drawShape(new Line2D.Double(getTouchPoint(out,start), end));
 			}
 			break;
 		case EDIT:
@@ -187,7 +192,7 @@ public class GraphPresenter extends Presenter {
 			int x = Integer.parseInt(v.getAttribute("PositionX"));
 			int y = Integer.parseInt(v.getAttribute("PositionY"));
 			// some deviation given
-			if(Math.pow(p.x-x,2)+Math.pow(p.y-y, 2) <= 110)
+			if(Math.pow(p.x-x,2)+Math.pow(p.y-y, 2) <= 200)
 				return v;
 		}
 		return null;
