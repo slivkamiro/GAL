@@ -2,6 +2,8 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -14,10 +16,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import model.Edge;
+import model.EdgeAdapter;
 import presenters.EditEdgePresenter;
 import presenters.EditEdgePresenter.EdgeEditor;
-import presenters.EditVertexPresenter;
 
 public class EditEdge extends JDialog implements EdgeEditor {
 
@@ -36,7 +37,7 @@ public class EditEdge extends JDialog implements EdgeEditor {
 	}
 
 	private void initComponents() {
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 282, 187);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -47,21 +48,21 @@ public class EditEdge extends JDialog implements EdgeEditor {
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGap(119)
+				.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
+					.addContainerGap(94, Short.MAX_VALUE)
 					.addComponent(lblWeight)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(spWeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(234, Short.MAX_VALUE))
+					.addGap(89))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGap(93)
+					.addGap(45)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblWeight)
 						.addComponent(spWeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(105, Short.MAX_VALUE))
+					.addContainerGap(48, Short.MAX_VALUE))
 		);
 		contentPanel.setLayout(gl_contentPanel);
 		{
@@ -70,20 +71,35 @@ public class EditEdge extends JDialog implements EdgeEditor {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
+				okButton.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent arg0) {
+						presenter.setWeight(spWeight.getValue().toString());
+						EditEdge.this.dispose();
+						
+					}
+					
+				});
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						EditEdge.this.dispose();
+						
+					}
+					
+				});
 				buttonPane.add(cancelButton);
 			}
 		}
 	}
 
-	public void showEdgeProp(Edge e) {
-		spWeight.setValue(e.getWeight());
+	public void showEdgeProp(EdgeAdapter e) {
+		spWeight.setValue(Integer.parseInt(e.getWeight()));
 		
 	}
 }

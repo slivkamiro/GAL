@@ -10,6 +10,7 @@ public class DemoPresenter extends Presenter {
 	private Demonstrator demonstrator;
 	
 	public DemoPresenter(Demonstrator d) {
+		super();
 		demonstrator = d;
 	}
 	

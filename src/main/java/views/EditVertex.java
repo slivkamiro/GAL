@@ -2,6 +2,8 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -16,7 +18,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
-import model.Vertex;
+import model.VertexAdapter;
 import presenters.EditVertexPresenter;
 import presenters.EditVertexPresenter.VertexEditor;
 
@@ -48,6 +50,7 @@ public class EditVertex extends JDialog implements VertexEditor {
 		JLabel lblId = new JLabel("ID:");
 		
 		txtfldID = new JTextField();
+		txtfldID.setEditable(false);
 		txtfldID.setColumns(10);
 		
 		JLabel lblAttributes = new JLabel("Attributes:");
@@ -56,6 +59,15 @@ public class EditVertex extends JDialog implements VertexEditor {
 		listAttr.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JButton btnAdd = new JButton("Add");
+		btnAdd.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				presenter.addAttribute(txtfldAtrName.getText(),txtfldAtrValue.getText());
+				txtfldAtrName.setText("");
+				txtfldAtrValue.setText("");
+			}
+			
+		});
 		
 		JLabel lblName = new JLabel("Name:");
 		
@@ -68,6 +80,14 @@ public class EditVertex extends JDialog implements VertexEditor {
 		txtfldAtrValue.setColumns(10);
 		
 		JButton btnRemove = new JButton("Remove");
+		btnRemove.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				presenter.removeAttribute(listAttr.getSelectedValue());
+				
+			}
+			
+		});
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -126,19 +146,34 @@ public class EditVertex extends JDialog implements VertexEditor {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
+				okButton.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent arg0) {
+						presenter.saveChanges();
+						EditVertex.this.dispose();
+						
+					}
+					
+				});
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent arg0) {
+						EditVertex.this.dispose();
+						
+					}
+					
+				});
 				buttonPane.add(cancelButton);
 			}
 		}
 	}
 
-	public void showVertexProp(Vertex v) {
+	public void showVertexProp(VertexAdapter v) {
 		txtfldID.setText(v.getId());
 		DefaultListModel<String> m = new DefaultListModel<String>();
 		for(String key : v.getAttributes().keySet()) {
@@ -146,5 +181,20 @@ public class EditVertex extends JDialog implements VertexEditor {
 		}
 		listAttr.setModel(m);
 		listAttr.repaint();
+	}
+
+	public void addToList(String s) {
+		DefaultListModel<String> m = (DefaultListModel<String>) listAttr.getModel();
+		m.addElement(s);
+		listAttr.setModel(m);
+		listAttr.repaint();
+	}
+
+	public void removeFromList(String s) {
+		DefaultListModel<String> m = (DefaultListModel<String>) listAttr.getModel();
+		m.removeElement(s);
+		listAttr.setModel(m);
+		listAttr.repaint();
+		
 	}
 }

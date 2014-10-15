@@ -1,30 +1,31 @@
 package presenters;
 
-import model.Edge;
+import model.EdgeAdapter;
 
 public class EditEdgePresenter extends Presenter {
 	
 	public interface EdgeEditor {
-		public void showEdgeProp(Edge e);
+		public void showEdgeProp(EdgeAdapter e);
 	}
 	
 	private EdgeEditor editor;
-	private Edge edge;
-	
-	public EditEdgePresenter() {
-		
-	}
+	private EdgeAdapter edge;
 	
 	public void setView(EdgeEditor e) {
 		editor = e;
 	}
 	
-	public void setEdge(Edge e) {
+	public void setEdge(EdgeAdapter e) {
 		edge = e;
 	}
 	
 	public void show() {
 		editor.showEdgeProp(edge);
+	}
+
+	public void setWeight(String w) {
+		edge.setWeight(w);
+		
 	}
 	
 
