@@ -57,8 +57,7 @@ public class EdgeAdapter extends CanvasObject {
 		e.setProperty("startX", ""+a.x);
 		e.setProperty("startY", ""+a.y);
 		e.setProperty("endX", ""+b.x);
-		e.setProperty("endY", ""+b.y);
-		
+		e.setProperty("endY", ""+b.y);		
 	}
 
 	@Override

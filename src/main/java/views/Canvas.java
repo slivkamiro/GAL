@@ -206,6 +206,5 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	public void clean() {
 		objects = new ArrayList<CanvasObject>();
-		repaint();
 	}
 }

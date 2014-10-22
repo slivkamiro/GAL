@@ -39,7 +39,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		future = new Stack<GraphAdapter>();
 		executor = Executors.newFixedThreadPool(1);
 		//alg = new ChiLiuEdmonds();
-		alg.addObserver(this);
+		//alg.addObserver(this);
 	}
 
 	public void start(GraphAdapter graph) {

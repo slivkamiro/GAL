@@ -115,5 +115,4 @@ public class GraphAdapter{
 	public Graph getGraph() {
 		return graph;
 	}
-
 }
