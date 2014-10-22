@@ -35,9 +35,8 @@ public class GraphAdapter{
 	
 	public GraphAdapter(Graph g) {
 		graph = g;
-		// Does it matter if ids are redundant
-		vId = 100;
-		eId = 100;
+		vId = getMaxVertexId() + 1;
+		eId = getMaxEdgeId() + 1;
 	}
 	
 	public VertexAdapter addVertex() {
@@ -86,6 +85,24 @@ public class GraphAdapter{
 		GraphMLReader reader = new GraphMLReader(graph);
 		InputStream is = new BufferedInputStream(new FileInputStream(f));
 		reader.inputGraph(is);
+		vId = getMaxVertexId() + 1;
+		eId = getMaxEdgeId() + 1;
+	}
+
+	private int getMaxEdgeId() {
+		int max = 1;
+		for(Edge e : graph.getEdges()) {
+			max = Integer.parseInt(e.getId().toString()) > max ? Integer.parseInt(e.getId().toString()) : max;
+		}
+		return max;
+	}
+
+	private int getMaxVertexId() {
+		int max = 1;
+		for(Vertex v : graph.getVertices()) {
+			max = Integer.parseInt(v.getId().toString()) > max ? Integer.parseInt(v.getId().toString()) : max;
+		}
+		return max;
 	}
 
 	public void write(File f) throws IOException {
