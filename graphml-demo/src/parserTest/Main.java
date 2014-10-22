@@ -44,8 +44,18 @@ public class Main {
 	        String sentence = person + " " + edge.getLabel() + " " + knownPerson
 	                + " since " + since + ".";
 	        System.out.println(sentence);
+	        
+	        
+	        // Add new propertie for writer
+	        edge.setProperty("weight", 100);
+	        vertex.setProperty("x", 10);
+	        vertex.setProperty("y", 20);
 	      }
 	    }
-	  }
+	    
+	    // WRITER
+	    GraphMLWriter writer = new GraphMLWriter(graph);
+	    writer.outputGraph(XML_OUT_FILE);
+	}
 
 }
