@@ -31,8 +31,8 @@ public abstract class Presenter {
 			presenter.setView(veditView);
 			presenter.setVertex((VertexAdapter)o);
 			veditView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-			veditView.setVisible(true);
 			presenter.show();
+			veditView.setVisible(true);
 			break;
 		case EDIT_EDGE:
 			EditEdgePresenter p = new EditEdgePresenter();
