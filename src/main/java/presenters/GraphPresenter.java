@@ -225,11 +225,13 @@ public class GraphPresenter extends Presenter {
 		double y2 = k*x2+q;
 		
 		if(def == start) {
+			// distance from end point to x1 and x2
 			if (Math.sqrt(Math.pow(x1-end.x,2)+Math.pow(y1-end.y,2)) < 
 					Math.sqrt(Math.pow(x2-end.x,2)+Math.pow(y2-end.y,2)))
 				return new Point((int)x1,(int)y1);
 			return new Point((int)x2,(int)y2);
 		}
+		// distance from start point to x1 and x2
 		if (Math.sqrt(Math.pow(x1-start.x,2)+Math.pow(y1-start.y,2)) < 
 				Math.sqrt(Math.pow(x2-start.x,2)+Math.pow(y2-start.y,2)))
 			return new Point((int)x1,(int)y1);

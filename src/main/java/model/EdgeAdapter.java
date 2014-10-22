@@ -3,7 +3,11 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
 
 import views.CanvasObject;
 
@@ -74,8 +78,42 @@ public class EdgeAdapter extends CanvasObject {
 		g2.setColor(Color.BLACK);
 		if(this.getShape() != null) {
 			g2.draw(this.getShape());
-			int x = (int) (((Line2D) this.getShape()).getX1() + ((Line2D) this.getShape()).getX2())/2;
-			int y = (int) (((Line2D) this.getShape()).getY1() + ((Line2D) this.getShape()).getY2())/2;
+			double x1 = ((Line2D) this.getShape()).getX1();
+			double x2 = ((Line2D) this.getShape()).getX2();
+			double y1 = ((Line2D) this.getShape()).getY1();
+			double y2 = ((Line2D) this.getShape()).getY2();
+			int x = (int) (x1 + x2)/2;
+			int y = (int) (y1 + y2)/2;
+			
+			// length of the line
+			double length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+			// angle with x
+			double angle = Math.atan2(y2-y1, x2-x1);
+			
+			// arrow
+			GeneralPath path = new GeneralPath();
+			path.moveTo((float)length, 0);
+			path.lineTo((float)length - 10, -5);
+			path.lineTo((float)length - 7, 0);
+			path.lineTo((float)length - 10, 5);
+			path.lineTo((float)length, 0);
+			path.closePath();
+			
+			try {
+				AffineTransform af = AffineTransform.getTranslateInstance(x1, y1);
+				af.concatenate(AffineTransform.getRotateInstance(angle));
+				g2.transform(af);
+				
+				Area area = new Area(path);
+				g2.fill(area);
+			
+				af.invert();
+				g2.transform(af);
+			} catch (NoninvertibleTransformException e) {
+				// TODO: what to do here?
+				e.printStackTrace();
+			}
+			
 			g2.drawString(this.getLabel(),x , y );
 			
 		}		
