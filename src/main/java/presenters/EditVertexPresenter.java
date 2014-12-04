@@ -8,33 +8,33 @@ import java.util.Map;
 import model.VertexAdapter;
 
 public class EditVertexPresenter extends Presenter {
-	
+
 	public interface VertexEditor {
 		public void showVertexProp(VertexAdapter v);
 		public void addToList(String s);
 		public void removeFromList(String s);
 	}
-	
+
 	private VertexEditor editor;
 	private VertexAdapter vertex;
-	
+
 	private Map<String,String> newAttrs;
 	private List<String> toRemove;
-	
+
 	public EditVertexPresenter() {
 		super();
 		newAttrs = new HashMap<String,String>();
 		toRemove = new ArrayList<String>();
 	}
-	
+
 	public void setView(VertexEditor view) {
 		editor = view;
 	}
 
 	public void setVertex(VertexAdapter o) {
-		vertex = o;		
+		vertex = o;
 	}
-	
+
 	public void show() {
 		editor.showVertexProp(vertex);
 	}
@@ -47,8 +47,9 @@ public class EditVertexPresenter extends Presenter {
 	}
 
 	public void removeAttribute(String selectedValue) {
+		// TODO do not remove position attributes
 		editor.removeFromList(selectedValue);
-		
+
 		String key = selectedValue.split(" : ")[0];
 		String val = selectedValue.split(" : ")[1];
 		for(String k : newAttrs.keySet()) {
@@ -57,9 +58,9 @@ public class EditVertexPresenter extends Presenter {
 				return;
 			}
 		}
-		
+
 		toRemove.add(key);
-		
+
 	}
 
 	public void saveChanges() {
@@ -69,6 +70,6 @@ public class EditVertexPresenter extends Presenter {
 		for(String k : toRemove) {
 			vertex.deleteAttribute(k);
 		}
-		
+
 	}
 }
