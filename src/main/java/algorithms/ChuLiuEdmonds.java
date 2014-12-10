@@ -138,6 +138,10 @@ public class ChuLiuEdmonds extends Algorithm {
 		
 		publishSubGraph();
 		
+		if (this.vertices.size() == 0 &&  !this.cycleToShrink ){
+			this.phase = Phase.B;
+		}
+		
 		if (this.cycles.size() == 0 && this.phase == Phase.B){		
 			this.doneFlag = true;
 			return;
@@ -186,10 +190,6 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			
 		}	
-		
-		if (this.vertices.size() == 0){
-			this.phase = Phase.B;
-		}
 	}
 
 	private void reconstructWorkingGraph(){
@@ -206,7 +206,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 		
 		Graph g = new TinkerGraph();
-		this.cycleVertex = g.addVertex(new String("cycle" + this.cycles.size()));
+		this.cycleVertex = g.addVertex("-"+this.cycles.size());
 		cycleVertex.setProperty("cycleId", this.cycles.size());
 		setVertexCoords(this.cycleVertex, this.cycleVertices.iterator().next());
 
@@ -549,7 +549,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	private Vertex getCycleVertex(){
 		for (Vertex v : this.workingGraph.getVertices()){
 			String vid = (String)v.getId();
-			if (vid.contains("cycle") && v.getProperty("cycleId").equals(this.cycles.size())){
+			if (v.getProperty("cycleId") != null && v.getProperty("cycleId").equals(this.cycles.size())){
 				System.out.println("cycle vertex found " + vid + " " + v.getProperty("cycleId"));
 				return v;
 			}
@@ -574,21 +574,21 @@ public class ChuLiuEdmonds extends Algorithm {
 		
 		String sV = "";
 		for (Vertex v : this.vertices){
-			sV += v.getId() + "["+v.getProperty("PositionX") +", "+v.getProperty("PositionY")+"], ";
+			sV += v.getId()+", ";;
 		}
 		System.out.print("V = { " + sV + " }\n");
 		
 
 		String sBV = "";
 		for (Vertex v : this.vertexBucket){
-			sBV += v.getId() + "["+v.getProperty("PositionX") +", "+v.getProperty("PositionY")+"], ";
+			sBV += v.getId()+", ";
 		}
 		System.out.print("BV = { " + sBV + " }\n");
 		
 
 		String sBE = "";
 		for (Edge e : this.edgeBucket){
-			sBE += edgeToString(e) + "["+e.getProperty("startX") +", "+e.getProperty("endX")+"], ";
+			sBE += edgeToString(e) + ", "; 
 		}
 		System.out.print("BE = { " + sBE + " }\n");
 		
@@ -616,8 +616,8 @@ public class ChuLiuEdmonds extends Algorithm {
 		// construct subgraph from BE
 		Graph g = new TinkerGraph();
 		Edge edge = null;
-		Vertex vertexIn = null; 
-		Vertex vertexOut = null;
+		Vertex vertexIn; 
+		Vertex vertexOut;
 		
 		for (Edge e : this.edgeBucket){
 			vertexIn = g.getVertex(e.getVertex(Direction.IN).getId()); 
@@ -636,8 +636,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			edge.setProperty("weight", e.getProperty("weight"));
 			
 			vertexIn = null; 
-			vertexOut = null;
-			
+			vertexOut = null;			
 		}
 		
 		this.setOutput(g);
