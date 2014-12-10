@@ -1,0 +1,4 @@
+http://en.wikipedia.org/wiki/Edmonds%27_algorithm#References
+http://nvlpubs.nist.gov/nistpubs/jres/71B/jresv71Bn4p233_A1b.pdf  ----> EXAMPLES !!!
+https://github.com/mlbright/edmonds
+http://books.google.cz/books?id=Be6t04pgggwC&pg=PR4&lpg=PR4&dq=ISBN+0-521-28881-9&source=bl&ots=VGwvqzUMNh&sig=yRZwVeG61NPGGY9EbR1MyLMsloA&hl=sk&sa=X&ei=_A2GVLisKdPSaKq3gPgG&ved=0CFsQ6AEwCA#v=onepage&q=edmonds%20algorithm%20&f=false -- GIBBONS !!!!
