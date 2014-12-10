@@ -48,12 +48,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	private boolean cycleToShrink;
 	private boolean doneFlag;
 
-	/**
-	 * Constructor.
-	 * @param graph
-	 */
-	public ChuLiuEdmonds(Graph graph) {
-		
+	public ChuLiuEdmonds() {
 		this.branching = Branching.MIN;
 		
 		this.doneFlag = false;
@@ -61,7 +56,6 @@ public class ChuLiuEdmonds extends Algorithm {
 		
 		this.root = null;
 		this.phase = Phase.A;
-		this.workingGraph = graph;
 		this.cycleVertex = null;
 		
 		this.cycle = new HashSet<Edge>();
@@ -72,11 +66,15 @@ public class ChuLiuEdmonds extends Algorithm {
 		
 		this.workingGraphs = new Vector<Graph>();
 		this.cycles = new Vector<Set<Edge>>();
-		
-		// Iterable to set
-		for (Vertex v : graph.getVertices()) {
-			this.vertices.add(v);
-		}
+	}
+	
+	/**
+	 * Constructor.
+	 * @param graph
+	 */
+	public ChuLiuEdmonds(Graph graph) {
+		this();
+		this.setGraph(graph);
 	}
 	
 	/**
@@ -98,6 +96,20 @@ public class ChuLiuEdmonds extends Algorithm {
 		this(graph);
 		this.root = root;
 	}
+	
+	/**
+	 * This method sets graph that should be algorithm performed on.
+	 * @param g
+	 */
+	public void setGraph(Graph g){
+		this.workingGraph = g;
+		
+		// Iterable to set
+		for (Vertex v : g.getVertices()) {
+			this.vertices.add(v);
+		}
+	}
+
 
 	
 	public void execute(){
@@ -597,18 +609,11 @@ public class ChuLiuEdmonds extends Algorithm {
 
 	public void publishSubGraph(){
 		// construct subgraph
+		Graph g = new TinkerGraph();
+		
 		// this.setOutput(g);
 		// if all steps are published set subgraph to null
 	}
-	
-	/**
-	 * This method sets graph that should be algorithm performed on.
-	 * @param g
-	 */
-	public void setGraph(Graph g){
-		this.workingGraph = g;
-	}
-
 }
 
 
