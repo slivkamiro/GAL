@@ -40,7 +40,7 @@ public class EditVertexPresenter extends Presenter {
 	}
 
 	public void addAttribute(String name, String value) {
-		if(name != "" && value != "") {
+		if (name != "" && value != "") {
 			newAttrs.put(name, value);
 			editor.addToList(name+" : "+value);
 		}
@@ -52,8 +52,8 @@ public class EditVertexPresenter extends Presenter {
 
 		String key = selectedValue.split(" : ")[0];
 		String val = selectedValue.split(" : ")[1];
-		for(String k : newAttrs.keySet()) {
-			if(k == key && newAttrs.get(k) == val) {
+		for (String k : newAttrs.keySet()) {
+			if (k == key && newAttrs.get(k) == val) {
 				newAttrs.remove(k);
 				return;
 			}
@@ -64,10 +64,10 @@ public class EditVertexPresenter extends Presenter {
 	}
 
 	public void saveChanges() {
-		for(String k : newAttrs.keySet()) {
+		for (String k : newAttrs.keySet()) {
 			vertex.setAttribute(k, newAttrs.get(k));
 		}
-		for(String k : toRemove) {
+		for (String k : toRemove) {
 			vertex.deleteAttribute(k);
 		}
 

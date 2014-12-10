@@ -62,14 +62,14 @@ public class GraphPresenter extends Presenter {
 	}
 
 	public void endPoint(Point point) {
-		switch(mode) {
+		switch (mode) {
 		case EDGE:
 			end = point;
 			// add edge to model and draw it on canvas
 			VertexAdapter out = getVertexOnPosition(start);
 			VertexAdapter in = getVertexOnPosition(end);
 			editor.removeLast();
-			if(out != null && in != null) {
+			if (out != null && in != null) {
 				EdgeAdapter e = graph.addEdge(out, in);
 				e.setPoints(getTouchPoint(out,start), getTouchPoint(in,end));
 				editor.drawObject(e);
@@ -94,7 +94,7 @@ public class GraphPresenter extends Presenter {
 	public void startPoint(Point point) {
 		VertexAdapter v = null;
 		EdgeAdapter e = null;
-		switch(mode) {
+		switch (mode) {
 		case EDGE:
 			start = point;
 			end = point;
@@ -103,30 +103,30 @@ public class GraphPresenter extends Presenter {
 			break;
 		case EDIT:
 			v = getVertexOnPosition(point);
-			if(v != null) {
+			if (v != null) {
 				this.populateDialog(Presenter.Dialogs.EDIT_VERTEX,v);
 				editor.editObject(v);
 				break;
 			}
 			e = getEdgeCloseTo(point);
-			if(e != null) {
+			if (e != null) {
 				this.populateDialog(Presenter.Dialogs.EDIT_EDGE, e);
 				editor.editObject(e);
 			}
 			break;
 		case REMOVE:
 			v = getVertexOnPosition(point);
-			if(v != null && v.getEdges().size() == 0) {
+			if (v != null && v.getEdges().size() == 0) {
 				graph.removeVertex(v);
 				editor.removeObjectCloseTo(point);
 				break;
-			} else if(v != null && v.getEdges().size() != 0) {
+			} else if (v != null && v.getEdges().size() != 0) {
 				// For simplicity user have to remove edges first
 				this.populateDialog(Presenter.Dialogs.MESSAGE, "First remove edges!");
 				break;
 			}
 			e = getEdgeCloseTo(point);
-			if(e != null) {
+			if (e != null) {
 				graph.removeEdge(e);
 				editor.removeObjectCloseTo(point);
 			}
@@ -140,9 +140,9 @@ public class GraphPresenter extends Presenter {
 
 	private EdgeAdapter getEdgeCloseTo(Point point) {
 		Point2D p1 = null, p2 = null;
-		for(CanvasObject o : editor.getObjects()) {
-			if(o instanceof EdgeAdapter) {
-				if(((EdgeAdapter) o).contains(point)) {
+		for (CanvasObject o : editor.getObjects()) {
+			if (o instanceof EdgeAdapter) {
+				if (((EdgeAdapter) o).contains(point)) {
 					p1 = ((Line2D)((EdgeAdapter) o).getShape()).getP1();
 					p2 = ((Line2D)((EdgeAdapter) o).getShape()).getP2();
 					break;
@@ -150,19 +150,17 @@ public class GraphPresenter extends Presenter {
 			}
 		}
 
-		if(p1 == null || p2 == null ) {
+		if (p1 == null || p2 == null )
 			return null;
-		}
 
 		VertexAdapter v1 = getVertexOnPosition(p1);
 		VertexAdapter v2 = getVertexOnPosition(p2);
 
-		if(v1 == null || v2 == null) {
+		if (v1 == null || v2 == null)
 			return null;
-		}
 
 		EdgeAdapter e = null;
-		if((e = graph.getEdge(v1,v2)) == null) {
+		if ((e = graph.getEdge(v1,v2)) == null) {
 			e = graph.getEdge(v2,v1);
 		}
 
@@ -174,11 +172,11 @@ public class GraphPresenter extends Presenter {
 	}
 
 	public void possibleEndPoint(Point point) {
-		switch(mode) {
+		switch (mode) {
 		case EDGE:
 			end = point;
 			final VertexAdapter out = getVertexOnPosition(start);
-			if(out != null) {
+			if (out != null) {
 				editor.removeLast();
 				editor.drawObject(new IntermediateEdge(getTouchPoint(out,start),end) );
 			}
@@ -201,13 +199,12 @@ public class GraphPresenter extends Presenter {
 	}
 
 	public VertexAdapter getVertexOnPosition(Point p) {
-		for(VertexAdapter v : graph.getVertices()) {
+		for (VertexAdapter v : graph.getVertices()) {
 			int x = Integer.parseInt(v.getAttribute("PositionX"));
 			int y = Integer.parseInt(v.getAttribute("PositionY"));
 			// some deviation given
-			if(Math.pow(p.x-x,2)+Math.pow(p.y-y, 2) <= 200) {
+			if (Math.pow(p.x-x,2)+Math.pow(p.y-y, 2) <= 200)
 				return v;
-			}
 		}
 		return null;
 	}
@@ -225,28 +222,25 @@ public class GraphPresenter extends Presenter {
 		double c = x0 * x0 + (q-y0) * (q-y0)-100;
 		double d = b*b-4*a*c;
 
-		if(d < 0) {
+		if(d < 0)
 			return def;
-		}
 
 		double x1 = (-1*b + Math.sqrt(d))/(2*a);
 		double x2 = (-1*b - Math.sqrt(d))/(2*a);
 		double y1 = k*x1+q;
 		double y2 = k*x2+q;
 
-		if(def == start) {
+		if (def == start) {
 			// distance from end point to x1 and x2
 			if (Math.sqrt(Math.pow(x1-end.x,2)+Math.pow(y1-end.y,2)) <
-					Math.sqrt(Math.pow(x2-end.x,2)+Math.pow(y2-end.y,2))) {
+					Math.sqrt(Math.pow(x2-end.x,2)+Math.pow(y2-end.y,2)))
 				return new Point((int)x1,(int)y1);
-			}
 			return new Point((int)x2,(int)y2);
 		}
 		// distance from start point to x1 and x2
 		if (Math.sqrt(Math.pow(x1-start.x,2)+Math.pow(y1-start.y,2)) <
-				Math.sqrt(Math.pow(x2-start.x,2)+Math.pow(y2-start.y,2))) {
+				Math.sqrt(Math.pow(x2-start.x,2)+Math.pow(y2-start.y,2)))
 			return new Point((int)x1,(int)y1);
-		}
 		return new Point((int)x2,(int)y2);
 	}
 
@@ -301,9 +295,8 @@ public class GraphPresenter extends Presenter {
 			// This object should be removed after final end point is set, so this method is just
 			// for completeness
 			Line2D l = (Line2D) this.getShape();
-			if(Line2D.ptLineDist(l.getX1(), l.getY1(),l.getX2(), l.getY2(), p.x, p.y) < 10.0) {
+			if (Line2D.ptLineDist(l.getX1(), l.getY1(),l.getX2(), l.getY2(), p.x, p.y) < 10.0)
 				return true;
-			}
 			return false;
 		}
 
@@ -318,7 +311,7 @@ public class GraphPresenter extends Presenter {
 		public void drawObject(Graphics2D g2) {
 			// this is overrided so that arrow is drawn always
 			g2.setColor(Color.BLACK);
-			if(this.getShape() != null) {
+			if (this.getShape() != null) {
 				g2.draw(this.getShape());
 				double x1 = ((Line2D) this.getShape()).getX1();
 				double x2 = ((Line2D) this.getShape()).getX2();

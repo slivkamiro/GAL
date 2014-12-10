@@ -15,10 +15,16 @@ public abstract class Algorithm extends Observable implements Runnable {
 
 	public void run() {
 		doStep();
-		setChanged();
-		notifyObservers();
+		if (g != null) {
+			setChanged();
+			notifyObservers();
+		}
 	}
 
+	/**
+	 * This should be called when new step was executed.
+	 * @param g
+	 */
 	protected void setOutput(Graph g) {
 		this.g = new GraphAdapter(g);
 	}

@@ -18,25 +18,25 @@ import com.tinkerpop.blueprints.Vertex;
 public class VertexAdapter extends CanvasObject{
 
 	private Vertex v;
-	
+
 	public VertexAdapter(Vertex v) {
 		super();
 		this.v = v;
 		this.setLabel(v.getId().toString());
 	}
-	
+
 	public Vertex getVertex() {
 		return v;
 	}
-	
+
 	public void addEdge(EdgeAdapter e) {
 		v.addEdge("1", e.getInVertex().getVertex());
 	}
-	
+
 	public void setAttribute(String name, String value) {
 		v.setProperty(name,value);
 	}
-	
+
 	public String getAttribute(String name) {
 		return v.getProperty(name).toString();
 	}
@@ -47,7 +47,7 @@ public class VertexAdapter extends CanvasObject{
 
 	public Map<String,String> getAttributes() {
 		Map<String,String> attributes = new HashMap<String,String>();
-		for(String key : v.getPropertyKeys()) {
+		for (String key : v.getPropertyKeys()) {
 			attributes.put(key, v.getProperty(key).toString());
 		}
 		return attributes;
@@ -55,7 +55,7 @@ public class VertexAdapter extends CanvasObject{
 
 	public List<EdgeAdapter> getEdges() {
 		List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
-		for(Edge e : v.getEdges(Direction.BOTH, "1")) {
+		for (Edge e : v.getEdges(Direction.BOTH, "1")) {
 			edges.add(new EdgeAdapter(e));
 		}
 		return edges;
@@ -63,19 +63,19 @@ public class VertexAdapter extends CanvasObject{
 
 	public void deleteAttribute(String k) {
 		v.removeProperty(k);
-		
+
 	}
-	
+
 	@Override
 	public void drawObject(Graphics2D g2) {
 		g2.setColor(Color.BLACK);
-		if(this.getShape() != null) {
+		if (this.getShape() != null) {
 			g2.draw(this.getShape());
 			int x = (int) ((Ellipse2D) this.getShape()).getCenterX();
 			int y = (int) ((Ellipse2D) this.getShape()).getCenterY();
 			g2.drawString(this.getLabel(),x , y );
-			
-		}		
+
+		}
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class VertexAdapter extends CanvasObject{
 		Integer y = Integer.parseInt(v.getProperty("PositionY").toString());
 		Ellipse2D e = new Ellipse2D.Double(x-10.0, y-10.0, 20.0, 20.0);
 		this.setShape(e);
-		
+
 	}
 
 	@Override

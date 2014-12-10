@@ -11,20 +11,20 @@ import views.EditVertex;
 import views.Message;
 
 public abstract class Presenter {
-	
+
 	private JApplet view;
-	
+
 	public enum Dialogs {
 		EDIT_VERTEX,
 		EDIT_EDGE,
 		MESSAGE
 	}
-	
+
 	public Presenter() {
 	}
-	
+
 	public void populateDialog(Dialogs d,Object o) {
-		switch(d) {
+		switch (d) {
 		case EDIT_VERTEX:
 			EditVertexPresenter presenter = new EditVertexPresenter();
 			EditVertex veditView = new EditVertex(presenter);
@@ -52,9 +52,9 @@ public abstract class Presenter {
 			break;
 		}
 	}
-	
+
 	public void setView(JApplet view) {
 		this.view = view;
 	}
-	
+
 }

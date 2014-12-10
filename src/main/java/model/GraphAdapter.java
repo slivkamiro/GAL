@@ -20,33 +20,33 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
 
 public class GraphAdapter{
-	
-	
+
+
 	private Graph graph;
-	
+
 	private Integer vId;
 	private Integer eId;
-	
+
 	public GraphAdapter() {
 		vId = 1;
 		eId = 1;
 		graph = new TinkerGraph();
 	}
-	
+
 	public GraphAdapter(Graph g) {
 		graph = g;
 		vId = getMaxVertexId() + 1;
 		eId = getMaxEdgeId() + 1;
 	}
-	
+
 	public VertexAdapter addVertex() {
 		return new VertexAdapter(graph.addVertex(String.valueOf(vId++)));
 	}
-	
+
 	public VertexAdapter addVertex(String id) {
 		return new VertexAdapter(graph.addVertex(id));
 	}
-	
+
 	public EdgeAdapter addEdge(VertexAdapter out, VertexAdapter in) {
 		EdgeAdapter e = new EdgeAdapter(
 				graph.addEdge(String.valueOf(eId++), out.getVertex(), in.getVertex(), "1"));
@@ -56,7 +56,7 @@ public class GraphAdapter{
 
 	public List<VertexAdapter> getVertices() {
 		List<VertexAdapter> vertices = new ArrayList<VertexAdapter>();
-		for(Vertex v : graph.getVertices()) {
+		for (Vertex v : graph.getVertices()) {
 			vertices.add(new VertexAdapter(v));
 		}
 		return vertices;
@@ -64,13 +64,13 @@ public class GraphAdapter{
 
 	public void removeVertex(VertexAdapter v) {
 		graph.removeVertex(v.getVertex());
-		
+
 	}
 
 
 	public EdgeAdapter getEdge(VertexAdapter v1, VertexAdapter v2) {
-		for(Edge e : v1.getVertex().getEdges(Direction.OUT, "1")) {
-			if(e.getVertex(Direction.IN).equals(v2.getVertex()))
+		for (Edge e : v1.getVertex().getEdges(Direction.OUT, "1")) {
+			if (e.getVertex(Direction.IN).equals(v2.getVertex()))
 				return new EdgeAdapter(e);
 		}
 		return null;
@@ -78,7 +78,7 @@ public class GraphAdapter{
 
 	public void removeEdge(EdgeAdapter e) {
 		graph.removeEdge(e.getEdge());
-		
+
 	}
 
 	public void read(File f) throws IOException {
@@ -91,7 +91,7 @@ public class GraphAdapter{
 
 	private int getMaxEdgeId() {
 		int max = 1;
-		for(Edge e : graph.getEdges()) {
+		for (Edge e : graph.getEdges()) {
 			max = Integer.parseInt(e.getId().toString()) > max ? Integer.parseInt(e.getId().toString()) : max;
 		}
 		return max;
@@ -99,7 +99,7 @@ public class GraphAdapter{
 
 	private int getMaxVertexId() {
 		int max = 1;
-		for(Vertex v : graph.getVertices()) {
+		for (Vertex v : graph.getVertices()) {
 			max = Integer.parseInt(v.getId().toString()) > max ? Integer.parseInt(v.getId().toString()) : max;
 		}
 		return max;
@@ -107,16 +107,16 @@ public class GraphAdapter{
 
 	public void write(File f) throws IOException {
 		GraphMLWriter writer = new GraphMLWriter(graph);
-	    writer.outputGraph(f.getAbsolutePath());
-		
+		writer.outputGraph(f.getAbsolutePath());
+
 	}
 
 	public List<CanvasObject> getAll() {
 		List<CanvasObject> o = new ArrayList<CanvasObject>();
-		for(VertexAdapter v : getVertices()) {
+		for (VertexAdapter v : getVertices()) {
 			o.add(v);
 		}
-		for(Edge e : graph.getEdges()) {
+		for (Edge e : graph.getEdges()) {
 			EdgeAdapter ea = new EdgeAdapter(e);
 			int x1 = Integer.parseInt(e.getProperty("startX").toString());
 			int y1 = Integer.parseInt(e.getProperty("startY").toString());
@@ -128,7 +128,7 @@ public class GraphAdapter{
 		}
 		return o;
 	}
-	
+
 	public Graph getGraph() {
 		return graph;
 	}
