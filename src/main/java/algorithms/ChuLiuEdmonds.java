@@ -590,10 +590,10 @@ public class ChuLiuEdmonds extends Algorithm {
 		for (Vertex v : this.workingGraph.getVertices()){
 			String vid = (String)v.getId();
 			if (v.getProperty("cycleId") != null && v.getProperty("cycleId").equals(this.cycles.size())){
-				System.out.println("cycle vertex found " + vid + " " + v.getProperty("cycleId"));
+				//System.out.println("cycle vertex found " + vid + " " + v.getProperty("cycleId"));
 				return v;
 			}
-			System.out.println(vid + " " + v.getProperty("cycleId") + " " + this.cycles.size());
+			//System.out.println(vid + " " + v.getProperty("cycleId") + " " + this.cycles.size());
 		}
 		System.err.println("ERROR - cycle representing vertex not found!!");
 		return null;
