@@ -137,6 +137,12 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 		
 		publishSubGraph();
+		
+		if (this.cycles.size() == 0 && this.phase == Phase.B){		
+			this.doneFlag = true;
+			return;
+		}
+		
 	}
 	
 	public void doStepA() {
@@ -516,14 +522,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			
 		}
 		
-		this.edgeBucket = newEdgeBucket;
-		
-		if (this.cycles.size() == 0){		
-			this.doneFlag = true;
-			return;
-		}
-		
-		
+		this.edgeBucket = newEdgeBucket;		
 	}
 	
 	private Edge getInnerCycleMaxEdge(){
@@ -608,11 +607,40 @@ public class ChuLiuEdmonds extends Algorithm {
 	}
 
 	public void publishSubGraph(){
-		// construct subgraph
-		Graph g = new TinkerGraph();
 		
-		// this.setOutput(g);
-		// if all steps are published set subgraph to null
+		if (this.doneFlag){
+			this.setOutput((Graph)null);
+			return;
+		}
+		
+		// construct subgraph from BE
+		Graph g = new TinkerGraph();
+		Edge edge = null;
+		Vertex vertexIn = null; 
+		Vertex vertexOut = null;
+		
+		for (Edge e : this.edgeBucket){
+			vertexIn = g.getVertex(e.getVertex(Direction.IN).getId()); 
+			vertexOut = g.getVertex(e.getVertex(Direction.OUT).getId());
+			
+			if (vertexIn == null ){
+				vertexIn = g.addVertex(e.getVertex(Direction.IN).getId());
+				this.setVertexCoords(vertexIn, e.getVertex(Direction.IN));
+			}
+			if (vertexOut == null ){
+				vertexOut = g.addVertex(e.getVertex(Direction.OUT).getId());
+				this.setVertexCoords(vertexOut, e.getVertex(Direction.OUT));
+			}
+			
+			edge = vertexOut.addEdge(e.getLabel(), vertexIn);
+			edge.setProperty("weight", e.getProperty("weight"));
+			
+			vertexIn = null; 
+			vertexOut = null;
+			
+		}
+		
+		this.setOutput(g);
 	}
 }
 
