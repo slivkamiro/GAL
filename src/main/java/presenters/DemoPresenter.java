@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import model.GraphAdapter;
 import algorithms.Algorithm;
+import algorithms.ChuLiuEdmonds;
 
 
 public class DemoPresenter extends Presenter implements Observer {
@@ -38,8 +39,8 @@ public class DemoPresenter extends Presenter implements Observer {
 		history = new Stack<GraphAdapter>();
 		future = new Stack<GraphAdapter>();
 		executor = Executors.newFixedThreadPool(1);
-		//alg = new ChiLiuEdmonds();
-		//alg.addObserver(this);
+		alg = new ChuLiuEdmonds();
+		alg.addObserver(this);
 	}
 
 	public void start(GraphAdapter graph) {
