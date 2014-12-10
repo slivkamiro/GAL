@@ -9,7 +9,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 import model.GraphAdapter;
-import parserTest.DFS;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -598,7 +597,7 @@ public class ChuLiuEdmonds extends Algorithm {
 
 	public void publishSubGraph(){
 		// construct subgraph
-		// set subgraph
+		// this.setOutput(g);
 		// if all steps are published set subgraph to null
 	}
 	
@@ -607,7 +606,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	 * @param g
 	 */
 	public void setGraph(Graph g){
-		this.g = new GraphAdapter(g);
+		this.workingGraph = g;
 	}
 
 }
