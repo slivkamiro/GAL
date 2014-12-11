@@ -1,5 +1,9 @@
 package algorithms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import model.GraphAdapter;
@@ -12,6 +16,32 @@ public abstract class Algorithm extends Observable implements Runnable {
 	 * Output graph variable.
 	 */
 	private GraphAdapter g;
+
+	private Map<String,String> properties;
+
+	public Algorithm() {
+		properties = new HashMap<String,String>();
+	}
+
+	protected void addProperty(String name, String value) {
+		properties.put(name, value);
+	}
+
+	public String getProperty(String name) {
+		return properties.get(name);
+	}
+
+	public boolean propertyExists(String name) {
+		return properties.containsKey(name);
+	}
+
+	public List<String> getPropertiesName() {
+		return new ArrayList<String>(properties.keySet());
+	}
+
+	public List<String> getPropertiesValue() {
+		return new ArrayList<String>(properties.values());
+	}
 
 	public void run() {
 		doStep();
@@ -27,6 +57,7 @@ public abstract class Algorithm extends Observable implements Runnable {
 	 */
 	protected void setOutput(Graph g) {
 		this.g = new GraphAdapter(g);
+		this.g.recomputeEdgesCoords();
 	}
 
 	protected void setOutput(GraphAdapter g) {

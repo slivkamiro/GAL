@@ -132,4 +132,22 @@ public class GraphAdapter{
 	public Graph getGraph() {
 		return graph;
 	}
+
+	/**
+	 * Tries to recompute missing edges coordinates.
+	 */
+	public void recomputeEdgesCoords() {
+		for(EdgeAdapter e : getEdges()) {
+			e.setPoints(e.getOutVertex(),e.getInVertex());
+		}
+
+	}
+
+	public List<EdgeAdapter> getEdges() {
+		List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
+		for(Edge e : graph.getEdges()) {
+			edges.add(new EdgeAdapter(e));
+		}
+		return edges;
+	}
 }

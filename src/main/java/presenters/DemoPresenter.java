@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 import model.GraphAdapter;
 import algorithms.Algorithm;
-import algorithms.ChuLiuEdmonds;
+import algorithms.AlgorithmManager;
 
 
 public class DemoPresenter extends Presenter implements Observer {
@@ -16,6 +16,7 @@ public class DemoPresenter extends Presenter implements Observer {
 	public interface Demonstrator {
 		public void addEvent(String ev);
 		public void setGraph(GraphAdapter graph);
+		public String getSelectedAlgorithm();
 	}
 
 	private Demonstrator demonstrator;
@@ -31,6 +32,7 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	private ExecutorService executor;
 
+	private AlgorithmManager algManager;
 	private Algorithm alg = null;
 
 	public DemoPresenter(Demonstrator d) {
@@ -39,18 +41,28 @@ public class DemoPresenter extends Presenter implements Observer {
 		history = new Stack<GraphAdapter>();
 		future = new Stack<GraphAdapter>();
 		executor = Executors.newFixedThreadPool(1);
-		alg = new ChuLiuEdmonds();
-		alg.addObserver(this);
+		algManager = new AlgorithmManager();
 	}
 
 	public void start(GraphAdapter graph) {
-		history.push(graph);
-		alg.setGraph(graph.getGraph());
-		//demonstrator.setGraph(_);
+		// Called on demo button selected/deselected
+		if(alg == null) {
+			alg = algManager.getAlgorithm(demonstrator.getSelectedAlgorithm());
+			alg.addObserver(this);
+			history.push(graph);
+			alg.setGraph(graph.getGraph());
+		} else {
+			alg.deleteObserver(this);
+			alg = null;
+			// last element is on top of the stack
+			demonstrator.setGraph(history.firstElement());
+			history.clear();
+			future.clear();
+		}
+
 	}
 
-	public void stepForward(GraphAdapter graph) {
-		//history.push(graph);
+	public void stepForward() {
 		if (!future.empty()) {
 			history.push(future.peek());
 			demonstrator.setGraph(future.pop());
@@ -58,7 +70,6 @@ public class DemoPresenter extends Presenter implements Observer {
 		else {
 			executor.execute(alg);
 		}
-		//demonstrator.setGraph(_);
 	}
 
 	public void stepBackward() {
@@ -70,8 +81,18 @@ public class DemoPresenter extends Presenter implements Observer {
 		if (alg.equals(this.alg)) {
 			history.push(this.alg.getGraph());
 			demonstrator.setGraph(history.peek());
+			StringBuilder event = new StringBuilder();
+			for(String key : this.alg.getPropertiesName()) {
+				event.append(key+" ");
+				event.append(this.alg.getProperty(key)+"\n");
+			}
+			demonstrator.addEvent(event.toString());
 		}
 
+	}
+
+	public Object[] getAlgorithms() {
+		return algManager.getAlgorithms().toArray();
 	}
 
 }

@@ -71,7 +71,7 @@ public class GraphPresenter extends Presenter {
 			editor.removeLast();
 			if (out != null && in != null) {
 				EdgeAdapter e = graph.addEdge(out, in);
-				e.setPoints(getTouchPoint(out,start), getTouchPoint(in,end));
+				e.setPoints(out, in);
 				editor.drawObject(e);
 			}
 			break;
@@ -178,7 +178,7 @@ public class GraphPresenter extends Presenter {
 			final VertexAdapter out = getVertexOnPosition(start);
 			if (out != null) {
 				editor.removeLast();
-				editor.drawObject(new IntermediateEdge(getTouchPoint(out,start),end) );
+				editor.drawObject(new IntermediateEdge(EdgeAdapter.getTouchPoint(start,end,out,start),end) );
 			}
 			break;
 		case EDIT:
@@ -207,41 +207,6 @@ public class GraphPresenter extends Presenter {
 				return v;
 		}
 		return null;
-	}
-
-	private Point getTouchPoint(VertexAdapter circle,Point def) {
-
-		// smernica usecky
-		int y0 = Integer.parseInt(circle.getAttribute("PositionY"));
-		int x0 = Integer.parseInt(circle.getAttribute("PositionX"));
-		double k = (double)(end.y - start.y) / (double)(end.x - start.x);
-		double q = k*(-1*start.x)+start.y;
-		double a = 1+k*k;
-		double b = 2*k*(q-y0)- 2*x0;
-		// c = x0*x0 + (q-y0)^2 - r*r
-		double c = x0 * x0 + (q-y0) * (q-y0)-100;
-		double d = b*b-4*a*c;
-
-		if(d < 0)
-			return def;
-
-		double x1 = (-1*b + Math.sqrt(d))/(2*a);
-		double x2 = (-1*b - Math.sqrt(d))/(2*a);
-		double y1 = k*x1+q;
-		double y2 = k*x2+q;
-
-		if (def == start) {
-			// distance from end point to x1 and x2
-			if (Math.sqrt(Math.pow(x1-end.x,2)+Math.pow(y1-end.y,2)) <
-					Math.sqrt(Math.pow(x2-end.x,2)+Math.pow(y2-end.y,2)))
-				return new Point((int)x1,(int)y1);
-			return new Point((int)x2,(int)y2);
-		}
-		// distance from start point to x1 and x2
-		if (Math.sqrt(Math.pow(x1-start.x,2)+Math.pow(y1-start.y,2)) <
-				Math.sqrt(Math.pow(x2-start.x,2)+Math.pow(y2-start.y,2)))
-			return new Point((int)x1,(int)y1);
-		return new Point((int)x2,(int)y2);
 	}
 
 	public GraphAdapter getGraph() {

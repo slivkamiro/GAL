@@ -2,6 +2,7 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,7 @@ import java.io.File;
 
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -44,6 +46,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 	private Canvas canvas;
 
 	private JTextArea eventArea;
+	private JComboBox<Object> algorithms;
 
 	/**
 	 * Create the applet.
@@ -174,21 +177,48 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		toolBar.addSeparator();
 
-		JButton btnDemo = new JButton("Demo");
+		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
+		algorithms.setMaximumSize(new Dimension(100,22));
+		algorithms.setPreferredSize(new Dimension(100,22));
+		algorithms.setMinimumSize(new Dimension(100,22));
+		algorithms.setSelectedIndex(0);
+		toolBar.add(algorithms);
+
+		JToggleButton btnDemo = new JToggleButton("Demo");
 		btnDemo.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
+				gPresenter.setEditor(GraphPresenter.EditorOptions.NONE);
 				presenter.start(gPresenter.getGraph());
 
 			}
 
 		});
+
+		eGrp.add(btnDemo);
+
 		toolBar.add(btnDemo);
 
 		JButton btnBwd = new JButton("bwd");
+		btnBwd.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				presenter.stepBackward();
+
+			}
+
+		});
 		toolBar.add(btnBwd);
 
 		JButton btnFwd = new JButton("fwd");
+		btnFwd.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				presenter.stepForward();
+
+			}
+
+		});
 		toolBar.add(btnFwd);
 
 		JSplitPane splitPane = new JSplitPane();
@@ -237,6 +267,10 @@ public class MainWindow extends JApplet implements Demonstrator {
 	public void setGraph(GraphAdapter graph) {
 		gPresenter.setGraph(graph);
 
+	}
+
+	public String getSelectedAlgorithm() {
+		return algorithms.getSelectedItem().toString();
 	}
 
 }

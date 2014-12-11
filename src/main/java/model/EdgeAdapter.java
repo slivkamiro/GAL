@@ -64,6 +64,57 @@ public class EdgeAdapter extends CanvasObject {
 		e.setProperty("endY", ""+b.y);
 	}
 
+	public void setPoints(VertexAdapter out, VertexAdapter in) {
+		Point start = new Point(Integer.parseInt(out.getAttribute("PositionX")),
+				Integer.parseInt(out.getAttribute("PositionY")));
+		Point end = new Point(Integer.parseInt(in.getAttribute("PositionX")),
+				Integer.parseInt(in.getAttribute("PositionY")));
+		setPoints(getTouchPoint(start,end,out,start),getTouchPoint(start,end,in,end));
+	}
+
+	/**
+	 * Computes touch point of Vertex and Edge defined by two points.
+	 * @param start Edge start point
+	 * @param end Edge end point
+	 * @param circle Vertex
+	 * @param def Default value if no touch point found
+	 * @return Touch point or default value.
+	 */
+	public static Point getTouchPoint(Point start, Point end, VertexAdapter circle,Point def) {
+
+		// smernica usecky
+		int y0 = Integer.parseInt(circle.getAttribute("PositionY"));
+		int x0 = Integer.parseInt(circle.getAttribute("PositionX"));
+		double k = (double)(end.y - start.y) / (double)(end.x - start.x);
+		double q = k*(-1*start.x)+start.y;
+		double a = 1+k*k;
+		double b = 2*k*(q-y0)- 2*x0;
+		// c = x0*x0 + (q-y0)^2 - r*r
+		double c = x0 * x0 + (q-y0) * (q-y0)-100;
+		double d = b*b-4*a*c;
+
+		if(d < 0)
+			return def;
+
+		double x1 = (-1*b + Math.sqrt(d))/(2*a);
+		double x2 = (-1*b - Math.sqrt(d))/(2*a);
+		double y1 = k*x1+q;
+		double y2 = k*x2+q;
+
+		if (def == start) {
+			// distance from end point to x1 and x2
+			if (Math.sqrt(Math.pow(x1-end.x,2)+Math.pow(y1-end.y,2)) <
+					Math.sqrt(Math.pow(x2-end.x,2)+Math.pow(y2-end.y,2)))
+				return new Point((int)x1,(int)y1);
+			return new Point((int)x2,(int)y2);
+		}
+		// distance from start point to x1 and x2
+		if (Math.sqrt(Math.pow(x1-start.x,2)+Math.pow(y1-start.y,2)) <
+				Math.sqrt(Math.pow(x2-start.x,2)+Math.pow(y2-start.y,2)))
+			return new Point((int)x1,(int)y1);
+		return new Point((int)x2,(int)y2);
+	}
+
 	@Override
 	public boolean contains(Point p) {
 		Line2D l = (Line2D) this.getShape();
