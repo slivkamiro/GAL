@@ -44,8 +44,8 @@ public class ChuLiuEdmonds extends Algorithm {
 	private boolean doneFlag;
 
 	public ChuLiuEdmonds() {
-		this.branching = Branching.MIN;
 
+		this.branching = Branching.MIN; // NOT IMPLEMENTED - only MIN is default
 		this.doneFlag = false;
 		this.cycleToShrink = false;
 
@@ -112,7 +112,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	}
 
 
-
+	/** Execute algorithm - all steps */
 	public void execute(){
 		System.out.println("Algorithm execution called.");
 		while ( ! this.doneFlag ) {
@@ -123,24 +123,41 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 	}
 
+	/** Do single step of algorithm:
+	 * - examine node from V
+	 * - shrink cycle to cycle node and construct graph Gi+1
+	 * - expand shrinked cycle node
+	 */
 	@Override
 	public void doStep() {
 		if (this.cycleToShrink){
-			System.out.println("Reconstruction! - cycle shrinking");
 			reconstructWorkingGraph();
 			updateBuckets();
 			this.cycleToShrink = false;
 		}
 		else if ( this.phase == Phase.A ) {
+			// examine node from V
 			doStepA();
 		}
 		else {
+			// expand shrinked cycle node
 			doStepB();
 		}
 
 		publishSubGraph();
+
+		if (this.vertices.size() == 0 &&  !this.cycleToShrink ){
+			this.phase = Phase.B;
+		}
+
+		if (this.cycles.size() == 0 && this.phase == Phase.B){
+			this.doneFlag = true;
+			return;
+		}
+
 	}
 
+	/** Examine node from V - find incident edge with min. weight */
 	public void doStepA() {
 		System.out.println("[A] Step called.");
 
@@ -155,44 +172,43 @@ public class ChuLiuEdmonds extends Algorithm {
 			this.vertexBucket.add(v);
 
 			// debug
-			System.out.println(
-					"  vert : " + (String) v.getId());
+			System.out.println("  vert id : " + (String) v.getId());
 
 			e = getMinIncomingEdge(v);
+
 			if ( e == null )
 				return;
 
 			//debug
-			System.out.println(
-					"  edge : " + edgeToString(e) + " w=" + e.getProperty("weight"));
+
+			System.out.println("  edge : " + edgeToString(e) + " w=" + e.getProperty("weight"));
 
 			// find cycle in BV U {e}
 			this.cycle = new HashSet<Edge>();
 			getCycle(e);
-			if (this.cycle.size() != 0){
-				//				// debug
-				//				printStatus();
-				this.cycleToShrink = true;
-			}
 
-			// TODO - change in alg.
+			this.cycleToShrink = (this.cycle.size() != 0);
+
+			// TODO - change in alg. - edge {e} is added to BE only if there was not cycle
+
 			if (this.cycle.size() == 0){
 				this.edgeBucket.add(e);
 			}
 
 		}
-
-		if (this.vertices.size() == 0){
-			this.phase = Phase.B;
-		}
 	}
 
+	/** Reconstruct graph:
+	 * - create graph Gi
+	 * - contains cycle node Ci - overlaying cycle nodes from Gi-1
+	 */
 	private void reconstructWorkingGraph(){
+
+		System.out.println("Reconstruction! - cycle shrinking");
+
+		// save current state to stack
 		this.workingGraphs.add(this.workingGraph);
 		this.cycles.add(this.cycle);
-
-		System.out.println("cycle pushed");
-		System.out.println("graph pushed");
 
 
 		this.cycleVertices = new HashSet<Vertex>();
@@ -201,9 +217,15 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 
 		Graph g = new TinkerGraph();
-		this.cycleVertex = g.addVertex(new String("cycle" + this.cycles.size()));
+
+		// create Ci
+		this.cycleVertex = g.addVertex("-"+this.cycles.size());
 		cycleVertex.setProperty("cycleId", this.cycles.size());
 		setVertexCoords(this.cycleVertex, this.cycleVertices.iterator().next());
+
+		//
+		// Constract graph Gi
+		//
 
 		for (Vertex v : this.workingGraph.getVertices()){
 			if (!this.cycleVertices.contains(v)){
@@ -212,14 +234,16 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 		}
 
+		// also prepare modified version of BE
 		HashSet<Edge> newEdgeBucket = new HashSet<Edge>();
 
 		for (Edge e : this.workingGraph.getEdges()){
+
 			Object inId = e.getVertex(Direction.IN).getId();
 			Object outId = e.getVertex(Direction.OUT).getId();
 
 			boolean wasInBucket = this.edgeBucket.remove(e);
-			System.out.println(edgeToString(e) + " was in bucekt " + (wasInBucket?"true":"false"));
+			//System.out.println(edgeToString(e) + " was in bucekt " + (wasInBucket?"true":"false"));
 
 			if (this.cycleVertices.contains(e.getVertex(Direction.IN)) &&
 					this.cycleVertices.contains(e.getVertex(Direction.OUT))){
@@ -228,6 +252,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 
 			if (this.cycle.contains(e)){
+				// cycle edge
 				continue;
 			}
 
@@ -247,7 +272,6 @@ public class ChuLiuEdmonds extends Algorithm {
 				// TODO
 				Integer oldWeight = Integer.parseInt((String)e.getProperty("weight"));
 				Integer cycleEdgeWeight = getCycleInnerEdgeWeight(e.getVertex(Direction.IN));
-
 				Integer newWeight = oldWeight - cycleEdgeWeight;
 				System.out.print(edgeToString(newEdge) + " c="+newWeight+" ["+oldWeight+" - "+cycleEdgeWeight+"]\n");
 				newEdge.setProperty("weight", ""+newWeight);
@@ -262,10 +286,12 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 		}
 
+		// set Gi as working graph and update BE
 		this.workingGraph = g;
 		this.edgeBucket = newEdgeBucket;
 	}
 
+	/** Get inner edge of cycle which is incident to vertex v. */
 	private Integer getCycleInnerEdgeWeight(Vertex v){
 		for (Edge e : this.cycle){
 			if (e.getVertex(Direction.IN).equals(v))
@@ -276,6 +302,10 @@ public class ChuLiuEdmonds extends Algorithm {
 		return null;
 	}
 
+	/** Update set V and vertex bucket BV
+	 * V: add new cycle node
+	 * BV: remove cycle vertices from Gi-1
+	 */
 	private void updateBuckets(){
 		// BV
 		Iterator<Vertex> it = this.vertexBucket.iterator();
@@ -294,6 +324,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 	}
 
+	/** Get incident edge of vertex v with min. weight */
 	private Edge getMinIncomingEdge(Vertex v){
 		Edge edge = null;
 		Integer minWeight = 0;
@@ -319,6 +350,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		return minWeight <= 0 ? null : edge;
 	}
 
+	/** Get incident edge of vertex v with max. weight */
 	private Edge getMaxIncomingEdge(Vertex v){
 		Edge edge = null;
 		Integer maxWeight = 0;
@@ -340,7 +372,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		return maxWeight <= 0 ? null : edge;
 	}
 
-	/* getCycle wrapper */
+	/** getCycle wrapper - call DFS to find cycle in BE */
 	private void getCycle(Edge goalEdge){
 		unmarkBucketEdges();
 
@@ -360,6 +392,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 	}
 
+	/** DFS to find cycle in BE */
 	private void getCycle(Edge e, final Edge goalEdge){
 		for (Edge ee : e.getVertex(Direction.IN).getEdges(Direction.OUT)){
 			if (!this.edgeBucket.contains(ee) && !ee.equals(goalEdge)){
@@ -380,34 +413,39 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 	}
 
+	/** Prepare edges in BE for DFS - set property "mark" to "unmarked" */
 	private void unmarkBucketEdges(){
 		for (Edge e : this.edgeBucket){
 			e.setProperty("mark", "unmarked");
 		}
 	}
 
-
+	/** Expand cycle from top of cycles stack and update buckets. */
 	public void doStepB() {
 		System.out.println("[B] Step called - cycle expansion.");
 
-		// cycle node i
+		// cycle node ui (overlaying cycle Ci)
 		this.cycleVertex = getCycleVertex();
 		boolean outTreeRoot = isOutTreeRoot(this.cycleVertex);
 
-		// cycle edges i-1
+		// cycle edges of Gi-1
 		this.cycle = this.cycles.lastElement();
 		this.workingGraph = this.workingGraphs.lastElement();
 
-		// working graph i-1
+		// working graph Gi-1
 		this.cycles.remove(this.cycle);
 		this.workingGraphs.remove(this.workingGraph);
 
 		Graph g = new TinkerGraph();
 
+		//
 		// reconstruct BV
+		//
 		System.out.println("[B] RECONSTRUCT BV");
+
 		HashSet<Vertex> newVertexBucket = new HashSet<Vertex>();
 
+		// process nodes from BV
 		for (Vertex v : this.vertexBucket){
 			if (!v.equals(cycleVertex)){
 				Vertex newv = g.addVertex(v.getId());
@@ -417,7 +455,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 
 		this.cycleVertices = new HashSet<Vertex>();
-
+		// process cycle nodes
 		for (Edge e : this.cycle){
 			Vertex tmp = e.getVertex(Direction.OUT);
 			Vertex newv = g.addVertex(tmp.getId());
@@ -426,14 +464,20 @@ public class ChuLiuEdmonds extends Algorithm {
 			this.cycleVertices.add(tmp);
 		}
 
+		//update BV
 		this.vertexBucket = newVertexBucket;
 
+		//
 		// reconstruct BE
+		//
 		System.out.println("[B] RECONSTRUCT BE");
 
 		HashSet<Edge> newEdgeBucket = new HashSet<Edge>();
-		Edge cycleIncidentEdge = null; // from gi-1, there is always only one
 
+		Edge cycleIncidentEdge = null; // from Gi-1, there is always only one
+
+
+		// process BE bucket
 		for (Edge e : this.edgeBucket){
 
 			Object inId = e.getVertex(Direction.IN).getId();
@@ -444,10 +488,11 @@ public class ChuLiuEdmonds extends Algorithm {
 			Edge newEdge = null;
 
 			if ( e.getVertex(Direction.IN).equals(cycleVertex) ){
-				// (x,ui)
+				// (x,ui) - edge incident to cycle
 				Object weight = null;
 				Vertex iv = null;
 
+				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
 					Object tmpOutId = ee.getVertex(Direction.OUT).getId();
 					iv = ee.getVertex(Direction.IN);
@@ -466,6 +511,7 @@ public class ChuLiuEdmonds extends Algorithm {
 				Object weight = null;
 				Vertex ov = null;
 
+				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
 					Object tmpInId = ee.getVertex(Direction.IN).getId();
 					ov = ee.getVertex(Direction.OUT);
@@ -485,10 +531,12 @@ public class ChuLiuEdmonds extends Algorithm {
 			newEdgeBucket.add(newEdge);
 		}
 
-		// iterate also over cycle edges
+		// processcycle edges
 		Edge inneCycleMaxEdge = getInnerCycleMaxEdge();
 		Vertex cycleIncidentVertex = null;
+
 		if (cycleIncidentEdge != null) {
+			// there is incident edge to cycle Ci in Gi-1
 			cycleIncidentVertex = cycleIncidentEdge.getVertex(Direction.IN);
 		}
 
@@ -500,11 +548,12 @@ public class ChuLiuEdmonds extends Algorithm {
 
 			Edge newEdge = null;
 
-			// ci is out-tree root
+			// Ci is out-tree root
 			if (outTreeRoot && e.equals(inneCycleMaxEdge)) {
 				continue;
 			}
-			// check cycle incident edge
+			// ignore inner cycle edge which is incident to cycle node with existing
+			//	outer (src node is not in cycle) incident edge
 			else if (e.getVertex(Direction.IN).equals(cycleIncidentVertex)) {
 				continue;
 			}
@@ -516,16 +565,11 @@ public class ChuLiuEdmonds extends Algorithm {
 
 		}
 
+		// update BE
 		this.edgeBucket = newEdgeBucket;
-
-		if (this.cycles.size() == 0){
-			this.doneFlag = true;
-			return;
-		}
-
-
 	}
 
+	/** Get edge with max. weight from cycle edges */
 	private Edge getInnerCycleMaxEdge(){
 		Edge maxEdge = null;
 		Integer max = -1;
@@ -539,6 +583,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		return maxEdge;
 	}
 
+	/** Check if vertex's deg-(v)==0 */
 	private boolean isOutTreeRoot(Vertex v){
 		int size = 0;
 		for(Edge e : v.getEdges(Direction.IN)) {
@@ -547,25 +592,27 @@ public class ChuLiuEdmonds extends Algorithm {
 		return (size == 0);
 	}
 
+	/** Get cycle vertex from graph G - marked with property "cycleID"
+	 * Value of cycleID == i, vertex == ui overalying Ci in Gi-1
+	 */
 	private Vertex getCycleVertex(){
 		for (Vertex v : this.workingGraph.getVertices()){
 			String vid = (String)v.getId();
-			if (vid.contains("cycle") && v.getProperty("cycleId").equals(this.cycles.size())){
-				System.out.println("cycle vertex found " + vid + " " + v.getProperty("cycleId"));
+			if (v.getProperty("cycleId") != null && v.getProperty("cycleId").equals(this.cycles.size()))
+				//System.out.println("cycle vertex found " + vid + " " + v.getProperty("cycleId"));
 				return v;
-			}
-			System.out.println(vid + " " + v.getProperty("cycleId") + " " + this.cycles.size());
 		}
 		System.err.println("ERROR - cycle representing vertex not found!!");
 		return null;
 	}
 
+	/** Copy soord properties from vertex b to vertex a. */
 	private void setVertexCoords(Vertex a, Vertex b){
 		a.setProperty("PositionX", b.getProperty("PositionX"));
 		a.setProperty("PositionY", b.getProperty("PositionY"));
 	}
 
-
+	/** DEBUG - print current status of buckets. */
 	public void printStatus(){
 		System.out.print(
 				"-----------------------------------------------\n" +
@@ -575,21 +622,21 @@ public class ChuLiuEdmonds extends Algorithm {
 
 		String sV = "";
 		for (Vertex v : this.vertices){
-			sV += v.getId() + "["+v.getProperty("PositionX") +", "+v.getProperty("PositionY")+"], ";
+			sV += v.getId()+", ";;
 		}
 		System.out.print("V = { " + sV + " }\n");
 
 
 		String sBV = "";
 		for (Vertex v : this.vertexBucket){
-			sBV += v.getId() + "["+v.getProperty("PositionX") +", "+v.getProperty("PositionY")+"], ";
+			sBV += v.getId()+", ";
 		}
 		System.out.print("BV = { " + sBV + " }\n");
 
 
 		String sBE = "";
 		for (Edge e : this.edgeBucket){
-			sBE += edgeToString(e) + "["+e.getProperty("startX") +", "+e.getProperty("endX")+"], ";
+			sBE += edgeToString(e) + ", ";
 		}
 		System.out.print("BE = { " + sBE + " }\n");
 
@@ -607,12 +654,44 @@ public class ChuLiuEdmonds extends Algorithm {
 		return "(" + e.getVertex(Direction.OUT).getId() + "," + e.getVertex(Direction.IN).getId() + ")";
 	}
 
+	/** Publish graph.
+	 * Construct graph from BE and send it MVC controller.
+	 * If all steps of algortihm are done and published send null.
+	 */
 	public void publishSubGraph(){
-		// construct subgraph
-		Graph g = new TinkerGraph();
 
-		// this.setOutput(g);
-		// if all steps are published set subgraph to null
+		if (this.doneFlag){
+			this.setOutput((Graph)null);
+			return;
+		}
+
+		// construct subgraph from BE
+		Graph g = new TinkerGraph();
+		Edge edge = null;
+		Vertex vertexIn;
+		Vertex vertexOut;
+
+		for (Edge e : this.edgeBucket){
+			vertexIn = g.getVertex(e.getVertex(Direction.IN).getId());
+			vertexOut = g.getVertex(e.getVertex(Direction.OUT).getId());
+
+			if (vertexIn == null ){
+				vertexIn = g.addVertex(e.getVertex(Direction.IN).getId());
+				this.setVertexCoords(vertexIn, e.getVertex(Direction.IN));
+			}
+			if (vertexOut == null ){
+				vertexOut = g.addVertex(e.getVertex(Direction.OUT).getId());
+				this.setVertexCoords(vertexOut, e.getVertex(Direction.OUT));
+			}
+
+			edge = vertexOut.addEdge(e.getLabel(), vertexIn);
+			edge.setProperty("weight", e.getProperty("weight"));
+
+			vertexIn = null;
+			vertexOut = null;
+		}
+
+		this.setOutput(g);
 	}
 }
 
