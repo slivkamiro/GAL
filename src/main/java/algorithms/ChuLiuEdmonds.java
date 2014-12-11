@@ -130,6 +130,11 @@ public class ChuLiuEdmonds extends Algorithm {
 	 */
 	@Override
 	public void doStep() {
+		
+		if (this.doneFlag){
+			this.setOutput((Graph)null);
+		}
+		
 		if (this.cycleToShrink){
 			reconstructWorkingGraph();
 			updateBuckets();
@@ -188,12 +193,15 @@ public class ChuLiuEdmonds extends Algorithm {
 			getCycle(e);
 
 			this.cycleToShrink = (this.cycle.size() != 0);
-
+			if (this.cycleToShrink){
+				// public BE with cycle - difference from algorithm
+				this.publishSubGraph();
+			}
 			// TODO - change in alg. - edge {e} is added to BE only if there was not cycle
 
-			if (this.cycle.size() == 0){
+			//if (this.cycle.size() == 0){
 				this.edgeBucket.add(e);
-			}
+			//}
 
 		}
 	}
@@ -689,6 +697,19 @@ public class ChuLiuEdmonds extends Algorithm {
 
 			vertexIn = null;
 			vertexOut = null;
+		}
+		
+		// add edges from BV - root can be in BV without edges in BE
+		for (Vertex v : this.vertexBucket){
+			vertexIn = g.getVertex(v.getId());
+
+			if (vertexIn == null ){
+				vertexIn = g.addVertex(v.getId());
+				this.setVertexCoords(vertexIn, v);
+			}
+
+			vertexIn = null;
+
 		}
 
 		this.setOutput(g);
