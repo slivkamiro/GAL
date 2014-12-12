@@ -21,6 +21,7 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	private Demonstrator demonstrator;
 
+	private GraphAdapter presentGraph;
 	private Stack<GraphAdapter> history;
 
 	/**
@@ -42,6 +43,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		future = new Stack<GraphAdapter>();
 		executor = Executors.newFixedThreadPool(1);
 		algManager = new AlgorithmManager();
+		presentGraph = null;
 	}
 
 	public void start(GraphAdapter graph) {
@@ -49,13 +51,27 @@ public class DemoPresenter extends Presenter implements Observer {
 		if(alg == null) {
 			alg = algManager.getAlgorithm(demonstrator.getSelectedAlgorithm());
 			alg.addObserver(this);
-			history.push(graph);
+			presentGraph = graph;
+			//history.push(graph);
 			alg.setGraph(graph.getGraph());
 		} else {
+			stopDemo();
+		}
+
+	}
+
+	public void stopDemo() {
+		if(alg != null) {
 			alg.deleteObserver(this);
 			alg = null;
 			// last element is on top of the stack
-			demonstrator.setGraph(history.firstElement());
+			if(history.empty()) {
+				demonstrator.setGraph(presentGraph);
+			} else {
+				// Demonstration stopped in the middle
+				demonstrator.setGraph(history.firstElement());
+			}
+			presentGraph = null;
 			history.clear();
 			future.clear();
 		}
@@ -63,24 +79,32 @@ public class DemoPresenter extends Presenter implements Observer {
 	}
 
 	public void stepForward() {
-		if (!future.empty()) {
-			history.push(future.peek());
-			demonstrator.setGraph(future.pop());
-		}
-		else {
-			executor.execute(alg);
+		if (alg != null) {
+			if (!future.empty()) {
+				history.push(presentGraph);
+				presentGraph = future.pop();
+				demonstrator.setGraph(presentGraph);
+			}
+			else {
+				executor.execute(alg);
+			}
 		}
 	}
 
 	public void stepBackward() {
-		future.push(history.peek());
-		demonstrator.setGraph(history.pop());
+		if (!history.empty()) {
+			future.push(presentGraph);
+			presentGraph = history.pop();
+			demonstrator.setGraph(presentGraph);
+		}
 	}
 
 	public void update(Observable alg, Object o) {
 		if (alg.equals(this.alg)) {
-			history.push(this.alg.getGraph());
-			demonstrator.setGraph(history.peek());
+			history.push(presentGraph);
+			presentGraph = this.alg.getGraph();
+			//history.push(this.alg.getGraph());
+			demonstrator.setGraph(presentGraph);
 			StringBuilder event = new StringBuilder();
 			for(String key : this.alg.getPropertiesName()) {
 				event.append(key+" ");

@@ -56,8 +56,12 @@ public abstract class Algorithm extends Observable implements Runnable {
 	 * @param g
 	 */
 	protected void setOutput(Graph g) {
-		this.g = new GraphAdapter(g);
-		this.g.recomputeEdgesCoords();
+		if(g != null) {
+			this.g = new GraphAdapter(g);
+			this.g.recomputeEdgesCoords();
+		} else {
+			this.g = null;
+		}
 	}
 
 	protected void setOutput(GraphAdapter g) {

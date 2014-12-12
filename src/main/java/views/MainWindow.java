@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -81,6 +82,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
+		// Set file filter to xml only - graphML
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileFilter(new FileFilter() {
 
@@ -129,41 +131,49 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToolBar toolBar = new JToolBar();
 		getContentPane().add(toolBar, BorderLayout.NORTH);
 
+		// Creating vertex - stop demonstration if running
 		JToggleButton tglbtnVertex = new JToggleButton("Vertex");
 		tglbtnVertex.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.VERTEX);
+				presenter.stopDemo();
 			}
 
 		});
 		toolBar.add(tglbtnVertex);
 
+		// Creating edge - stop demonstration if running
 		JToggleButton tglbtnEdge = new JToggleButton("Edge");
 		tglbtnEdge.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDGE);
+				presenter.stopDemo();
 			}
 
 		});
 		toolBar.add(tglbtnEdge);
 
+		// Editing - stop demonstration if running
 		JToggleButton tglbtnEdit = new JToggleButton("Edit");
 		tglbtnEdit.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDIT);
+				presenter.stopDemo();
 			}
 
 		});
 		toolBar.add(tglbtnEdit);
 
+		// Removing - stop demonstration if running
 		JToggleButton tglbtnRemove = new JToggleButton("Remove");
 		tglbtnRemove.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.REMOVE);
+				presenter.stopDemo();
 			}
 
 		});
@@ -177,13 +187,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		toolBar.addSeparator();
 
-		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
-		algorithms.setMaximumSize(new Dimension(100,22));
-		algorithms.setPreferredSize(new Dimension(100,22));
-		algorithms.setMinimumSize(new Dimension(100,22));
-		algorithms.setSelectedIndex(0);
-		toolBar.add(algorithms);
-
+		// Demonstration start - initialize algorithm
 		JToggleButton btnDemo = new JToggleButton("Demo");
 		btnDemo.addActionListener(new ActionListener() {
 
@@ -199,7 +203,16 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		toolBar.add(btnDemo);
 
-		JButton btnBwd = new JButton("bwd");
+		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
+		algorithms.setMaximumSize(new Dimension(100,22));
+		algorithms.setPreferredSize(new Dimension(100,22));
+		algorithms.setMinimumSize(new Dimension(100,22));
+		algorithms.setSelectedIndex(0);
+		toolBar.add(algorithms);
+
+		// Demonstration step back
+		JButton btnBwd = new JButton();
+		btnBwd.setIcon(new ImageIcon(this.getClass().getResource("icons/bwd.png")));
 		btnBwd.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -210,7 +223,9 @@ public class MainWindow extends JApplet implements Demonstrator {
 		});
 		toolBar.add(btnBwd);
 
-		JButton btnFwd = new JButton("fwd");
+		// Demonstration step forwasrd
+		JButton btnFwd = new JButton();
+		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
 		btnFwd.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -251,13 +266,6 @@ public class MainWindow extends JApplet implements Demonstrator {
 		gPresenter.setView(canvas);
 
 		canvas.requestFocus();
-
-		/*JTextArea eventsArea = new JTextArea();
-		eventsArea.setBackground(SystemColor.menu);
-		eventsArea.setColumns(20);
-		eventsArea.setRows(50);
-		eventsArea.setEditable(false);
-		splitPane.setRightComponent(eventsArea);*/
 	}
 
 	public void addEvent(String ev) {

@@ -18,4 +18,13 @@
 	</dependency>
   	
   </dependencies>
+  
+  <build>
+  	<resources>
+  		<resource>
+	      <directory>src/main/resources</directory>
+	      <targetPath>views</targetPath>
+  		</resource>
+  	</resources>
+  </build>
 </project>
