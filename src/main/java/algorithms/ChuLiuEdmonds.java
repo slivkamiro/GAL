@@ -133,6 +133,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		
 		if (this.doneFlag){
 			this.setOutput((Graph)null);
+			return;
 		}
 		
 		if (this.cycleToShrink){
