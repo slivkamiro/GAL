@@ -23,8 +23,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
 import model.GraphAdapter;
@@ -34,6 +34,8 @@ import presenters.GraphPresenter;
 import utils.MyButtonGroup;
 
 public class MainWindow extends JApplet implements Demonstrator {
+	public MainWindow() {
+	}
 
 	/**
 	 *
@@ -49,35 +51,30 @@ public class MainWindow extends JApplet implements Demonstrator {
 	private JTextArea eventArea;
 	private JComboBox<Object> algorithms;
 
-	/**
-	 * Create the applet.
-	 */
-	public MainWindow() {
+	@Override
+	public void init() {
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			presenter = new DemoPresenter(this);
-			initComponents();
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			presenter = new DemoPresenter(getDemonstrator());
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					initComponents();
+				}
+			});
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("createGUI didn't complete successfully");
 		}
+	}
 
+	private Demonstrator getDemonstrator() {
+		return this;
 	}
 
 	private void initComponents() {
+
 		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
@@ -127,9 +124,10 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		});
 		mnFile.add(mntmSave);
+		// Add to applet
+		setJMenuBar(menuBar);
 
 		JToolBar toolBar = new JToolBar();
-		getContentPane().add(toolBar, BorderLayout.NORTH);
 
 		// Creating vertex - stop demonstration if running
 		JToggleButton tglbtnVertex = new JToggleButton("Vertex");
@@ -223,7 +221,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		});
 		toolBar.add(btnBwd);
 
-		// Demonstration step forwasrd
+		// Demonstration step forward
 		JButton btnFwd = new JButton();
 		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
 		btnFwd.addActionListener(new ActionListener() {
@@ -235,11 +233,12 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		});
 		toolBar.add(btnFwd);
+		// Add to applet
+		getContentPane().add(toolBar, BorderLayout.NORTH);
 
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(1.0);
 		splitPane.setEnabled(false);
-		getContentPane().add(splitPane, BorderLayout.CENTER);
 
 		JScrollPane scrollPaneL = new JScrollPane();
 		splitPane.setLeftComponent(scrollPaneL);
@@ -255,7 +254,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		eventArea.setBackground(SystemColor.control);
 		eventArea.setEditable(false);
 		eventArea.setRows(10);
-		eventArea.setColumns(20);
+		eventArea.setColumns(30);
 		panel.add(eventArea);
 
 		gPresenter = new GraphPresenter();
@@ -266,6 +265,9 @@ public class MainWindow extends JApplet implements Demonstrator {
 		gPresenter.setView(canvas);
 
 		canvas.requestFocus();
+		// Add to applet
+		getContentPane().add(splitPane, BorderLayout.CENTER);
+
 	}
 
 	public void addEvent(String ev) {

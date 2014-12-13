@@ -97,4 +97,16 @@ public class VertexAdapter extends CanvasObject{
 		}
 		return false;*/
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof VertexAdapter) {
+			VertexAdapter v = (VertexAdapter) o;
+			if (v.getLabel().equals(getLabel())
+					&& v.getId().equals(getId())
+					&& v.getVertex().equals(getVertex()))
+				return true;
+		}
+		return false;
+	}
 }

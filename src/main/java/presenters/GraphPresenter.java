@@ -69,7 +69,8 @@ public class GraphPresenter extends Presenter {
 			VertexAdapter out = getVertexOnPosition(start);
 			VertexAdapter in = getVertexOnPosition(end);
 			editor.removeLast();
-			if (out != null && in != null) {
+			// TODO in == out
+			if (out != null && in != null && !in.equals(out)) {
 				EdgeAdapter e = graph.addEdge(out, in);
 				e.setPoints(out, in);
 				editor.drawObject(e);

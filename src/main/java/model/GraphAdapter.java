@@ -116,15 +116,14 @@ public class GraphAdapter{
 		for (VertexAdapter v : getVertices()) {
 			o.add(v);
 		}
-		for (Edge e : graph.getEdges()) {
-			EdgeAdapter ea = new EdgeAdapter(e);
-			int x1 = Integer.parseInt(e.getProperty("startX").toString());
-			int y1 = Integer.parseInt(e.getProperty("startY").toString());
-			int x2 = Integer.parseInt(e.getProperty("endX").toString());
-			int y2 = Integer.parseInt(e.getProperty("endY").toString());
-			ea.setPoints(new Point(x1,y1), new Point(x2,y2));
-			ea.setLabel(e.getProperty("weight").toString());
-			o.add(ea);
+		for (EdgeAdapter e : getEdges()) {
+			int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
+			int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
+			int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
+			int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
+			e.setPoints(new Point(x1,y1), new Point(x2,y2));
+			e.setLabel(e.getEdge().getProperty("weight").toString());
+			o.add(e);
 		}
 		return o;
 	}

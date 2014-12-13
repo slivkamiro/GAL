@@ -50,6 +50,7 @@ public class EdgeAdapter extends CanvasObject {
 
 	@Override
 	public void initShape() {
+		//TODO if i->i
 		Line2D l = new Line2D.Double(a, b);
 		this.setShape(l);
 
@@ -127,6 +128,7 @@ public class EdgeAdapter extends CanvasObject {
 	public void drawObject(Graphics2D g2) {
 		g2.setColor(Color.BLACK);
 		if (this.getShape() != null) {
+
 			g2.draw(this.getShape());
 			double x1 = ((Line2D) this.getShape()).getX1();
 			double x2 = ((Line2D) this.getShape()).getX2();
