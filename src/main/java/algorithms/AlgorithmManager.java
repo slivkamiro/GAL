@@ -1,26 +1,39 @@
 package algorithms;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlgorithmManager {
 
-	private List<Algorithm> algorithms;
+	private List<Class<?>> algorithms;
 
 	public AlgorithmManager() {
-		algorithms = new ArrayList<Algorithm>();
-		algorithms.add(new ChuLiuEdmonds());
+		algorithms = new ArrayList<Class<?>>();
+		algorithms.add(ChuLiuEdmonds.class);
 		// New algorithms have to be added here
 	}
 
-	public List<Algorithm> getAlgorithms() {
-		return algorithms;
+	public List<String> getAlgorithms() {
+		List<String> names = new ArrayList<String>();
+		for(Class<?> c : algorithms) {
+			names.add(c.getSimpleName());
+		}
+		return names;
 	}
 
-	public Algorithm getAlgorithm(String name) {
-		for(Algorithm a : algorithms) {
-			if(a.toString().equals(name))
-				return a;
+	public Algorithm getAlgorithm(String name)
+			throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException {
+		for(Class<?> a : algorithms) {
+			if(a.getSimpleName().equals(name)) {
+				Constructor<?> constr = a.getConstructor();
+				Object o = constr.newInstance();
+				if(o instanceof Algorithm)
+					return (Algorithm) o;
+			}
 		}
 		return null;
 	}

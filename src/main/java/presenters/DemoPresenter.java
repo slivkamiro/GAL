@@ -1,5 +1,6 @@
 package presenters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Stack;
@@ -46,7 +47,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		presentGraph = null;
 	}
 
-	public void start(GraphAdapter graph) {
+	public void start(GraphAdapter graph) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		// Called on demo button selected/deselected
 		if(alg == null) {
 			alg = algManager.getAlgorithm(demonstrator.getSelectedAlgorithm());

@@ -8,6 +8,7 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
@@ -58,6 +59,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			presenter = new DemoPresenter(getDemonstrator());
 			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
 				public void run() {
 					initComponents();
 				}
@@ -99,6 +101,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int fcReturn = fc.showOpenDialog(MainWindow.this);
 				if (fcReturn == JFileChooser.APPROVE_OPTION) {
@@ -113,6 +116,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mntmSave.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int fcReturn = fc.showSaveDialog(MainWindow.this);
 				if(fcReturn == JFileChooser.APPROVE_OPTION) {
@@ -133,6 +137,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton tglbtnVertex = new JToggleButton("Vertex");
 		tglbtnVertex.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.VERTEX);
 				presenter.stopDemo();
@@ -145,6 +150,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton tglbtnEdge = new JToggleButton("Edge");
 		tglbtnEdge.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDGE);
 				presenter.stopDemo();
@@ -157,6 +163,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton tglbtnEdit = new JToggleButton("Edit");
 		tglbtnEdit.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDIT);
 				presenter.stopDemo();
@@ -169,6 +176,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton tglbtnRemove = new JToggleButton("Remove");
 		tglbtnRemove.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.REMOVE);
 				presenter.stopDemo();
@@ -189,9 +197,17 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton btnDemo = new JToggleButton("Demo");
 		btnDemo.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gPresenter.setEditor(GraphPresenter.EditorOptions.NONE);
-				presenter.start(gPresenter.getGraph());
+				try {
+					gPresenter.setEditor(GraphPresenter.EditorOptions.NONE);
+					presenter.start(gPresenter.getGraph());
+				} catch (InstantiationException | IllegalAccessException
+						| IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			}
 
@@ -213,6 +229,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		btnBwd.setIcon(new ImageIcon(this.getClass().getResource("icons/bwd.png")));
 		btnBwd.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				presenter.stepBackward();
 
@@ -226,6 +243,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
 		btnFwd.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				presenter.stepForward();
 
@@ -270,16 +288,19 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 	}
 
+	@Override
 	public void addEvent(String ev) {
 		eventArea.setText(eventArea.getText()+"\n"+ev);
 		eventArea.setCaretPosition(eventArea.getDocument().getLength());
 	}
 
+	@Override
 	public void setGraph(GraphAdapter graph) {
 		gPresenter.setGraph(graph);
 
 	}
 
+	@Override
 	public String getSelectedAlgorithm() {
 		return algorithms.getSelectedItem().toString();
 	}
