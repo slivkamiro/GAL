@@ -156,7 +156,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			this.phase = Phase.B;
 		}
 
-		if (this.cycles.size() == 0 && this.phase == Phase.B){
+		if (this.cycles.size() == 0 && this.phase == Phase.B && this.vertices.size() == 0){
 			this.doneFlag = true;
 			return;
 		}
@@ -712,8 +712,56 @@ public class ChuLiuEdmonds extends Algorithm {
 			vertexIn = null;
 
 		}
-
+		
+		int i = 0;
+		String sV = "";
+		for (Vertex v : this.vertices){
+			sV += v.getId();
+			if (i != this.vertices.size() - 1){
+				sV += ", ";
+			}
+			i++;
+		}
+		
+		String sBV = "";
+		i = 0;
+		for (Vertex v : this.vertexBucket){
+			sBV += v.getId();
+			if (i != this.vertexBucket.size() - 1){
+				sBV += ", ";
+			}
+			i++;
+		}
+		
+		String sBE = "";
+		i = 0;
+		for (Edge e : this.edgeBucket){
+			sBE += edgeToString(e);
+			if (i != this.edgeBucket.size() - 1){
+				sBE += ", ";
+			}
+			i++;
+		}
+		
+		String sC = "";
+		if (this.cycleToShrink) {
+			i = 0;
+			for (Edge e : this.cycle){
+				sC += edgeToString(e);
+				if (i != this.cycle.size() - 1){
+					sC += ", ";
+				}
+				i++;
+			}
+			this.addProperty("C", sC);
+		}
+		this.addProperty("V", sV);
+		this.addProperty("BV", sBV);
+		this.addProperty("BE", sBE);
 		this.setOutput(g);
+		
+		System.out.println("SETS:\nV: "+sV+"\nBV: "+sBV+"\nBE: "+sBE + "\nC: "+sC);
+		
 	}
 }
 
