@@ -272,6 +272,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 	public void addEvent(String ev) {
 		eventArea.setText(eventArea.getText()+"\n"+ev);
+		eventArea.setCaretPosition(eventArea.getDocument().getLength());
 	}
 
 	public void setGraph(GraphAdapter graph) {
