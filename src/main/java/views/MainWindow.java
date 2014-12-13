@@ -305,4 +305,10 @@ public class MainWindow extends JApplet implements Demonstrator {
 		return algorithms.getSelectedItem().toString();
 	}
 
+	@Override
+	public void clearEvents() {
+		eventArea.setText("");
+
+	}
+
 }

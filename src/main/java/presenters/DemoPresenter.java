@@ -16,6 +16,7 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	public interface Demonstrator {
 		public void addEvent(String ev);
+		public void clearEvents();
 		public void setGraph(GraphAdapter graph);
 		public String getSelectedAlgorithm();
 	}
@@ -65,6 +66,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		if(alg != null) {
 			alg.deleteObserver(this);
 			alg = null;
+			demonstrator.clearEvents();
 			// last element is on top of the stack
 			if(history.empty()) {
 				demonstrator.setGraph(presentGraph);
@@ -100,6 +102,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		}
 	}
 
+	@Override
 	public void update(Observable alg, Object o) {
 		if (alg.equals(this.alg)) {
 			history.push(presentGraph);
