@@ -43,6 +43,10 @@ public abstract class Algorithm extends Observable implements Runnable {
 		return new ArrayList<String>(properties.values());
 	}
 
+	public void clearProperties() {
+		properties.clear();
+	}
+
 	public void run() {
 		doStep();
 		if (g != null) {

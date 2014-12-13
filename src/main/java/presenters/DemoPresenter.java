@@ -110,6 +110,7 @@ public class DemoPresenter extends Presenter implements Observer {
 				event.append(key+" ");
 				event.append(this.alg.getProperty(key)+"\n");
 			}
+			this.alg.clearProperties();
 			demonstrator.addEvent(event.toString());
 		}
 
