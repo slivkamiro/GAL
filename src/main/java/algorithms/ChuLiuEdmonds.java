@@ -25,6 +25,8 @@ public class ChuLiuEdmonds extends Algorithm {
 		MAX 	// maximum branching
 	};
 
+	//private
+	
 	private Phase phase;
 	private Branching branching;
 
@@ -123,9 +125,6 @@ public class ChuLiuEdmonds extends Algorithm {
 		System.out.println("Algorithm execution called.");
 		while ( ! this.doneFlag ) {
 			doStep();
-
-			// debug
-			printStatus();
 		}
 	}
 
@@ -209,10 +208,10 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 
 			this.edgeBucket.add(e);
-			e.setProperty("bucket", true);
 		}
 	}
 
+	/** Choose incoming edge by weight and by selected branching */
 	protected Edge getIncomingEdge(Vertex v) {
 		return  (this.branching == Branching.MIN) ? getMinIncomingEdge(v) : getMaxIncomingEdge(v);
 	}
@@ -304,7 +303,6 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			if (wasInBucket){
 				newEdgeBucket.add(newEdge);
-				newEdge.setProperty("bucket", true);
 			}
 		}
 
@@ -313,6 +311,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		this.edgeBucket = newEdgeBucket;
 	}
 
+	/** Recalculate weight of edges incident to cycle node */
 	protected Integer recalculateWeight(Integer oldWeight, Integer cycleEdgeWeight){
 		System.out.print(" ["+oldWeight+" - "+cycleEdgeWeight+"]\n");
 		return oldWeight - cycleEdgeWeight;
@@ -537,15 +536,29 @@ public class ChuLiuEdmonds extends Algorithm {
 				// (ui,x)
 				Object weight = null;
 				Vertex ov = null;
+				Vertex tmpov = null;
 
 				System.out.println("Reconstruction (ui,x) : " + this.edgeToString(e));
 				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
 					Object tmpInId = ee.getVertex(Direction.IN).getId();
-					ov = ee.getVertex(Direction.OUT);
-					if (this.cycleVertices.contains(ov) && tmpInId.equals(inId) && ee.getProperty("bucket") != null){
-						weight = ee.getProperty("weight");
-						break;
+					tmpov = ee.getVertex(Direction.OUT);
+					if (this.cycleVertices.contains(tmpov) && tmpInId.equals(inId)){
+						Object tmpw = ee.getProperty("weight");
+						if (weight == null) {
+							weight = tmpw;
+						}
+						else{
+							Integer oldw = Integer.parseInt((String)weight);
+							Integer neww = Integer.parseInt((String)tmpw);
+							if (this.branching == Branching.MIN){
+								weight = (oldw > neww) ? tmpw : weight;
+							}
+							else {
+								weight = (oldw < neww) ? tmpw : weight;
+							}
+						}
+						ov = tmpov;
 					}
 				}
 
@@ -560,8 +573,8 @@ public class ChuLiuEdmonds extends Algorithm {
 			newEdgeBucket.add(newEdge);
 		}
 
-		// processcycle edges
-		Edge inneCycleMaxEdge = getInnerCycleMaxEdge();
+		// process cycle edges
+		Edge innerCycleExtremeEdge = this.branching == Branching.MIN ? getInnerCycleMaxEdge() : getInnerCycleMinEdge();
 		Vertex cycleIncidentVertex = null;
 
 		if (cycleIncidentEdge != null) {
@@ -578,7 +591,9 @@ public class ChuLiuEdmonds extends Algorithm {
 			Edge newEdge = null;
 
 			// Ci is out-tree root
-			if (outTreeRoot && e.equals(inneCycleMaxEdge)) {
+			if (outTreeRoot && innerCycleExtremeEdge.getVertex(Direction.IN).equals(e.getVertex(Direction.IN))
+					&& innerCycleExtremeEdge.getVertex(Direction.OUT).equals(e.getVertex(Direction.OUT))) {
+				//System.out.println("OUROOT");
 				continue;
 			}
 			// ignore inner cycle edge which is incident to cycle node with existing
@@ -611,12 +626,34 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 		return maxEdge;
 	}
+	
+	/** Get edge with min. weight from cycle edges */
+	private Edge getInnerCycleMinEdge(){
+		Edge minEdge = null;
+		Integer min = null;
+		
+		for (Edge e : this.cycle){
+			Integer ew = Integer.parseInt((String)e.getProperty("weight"));
+			if (minEdge == null || ew < min){
+				min = ew;
+				minEdge = e;
+			}
+		}
+		return minEdge;
+	}
 
 	/** Check if vertex's deg-(v)==0 */
 	private boolean isOutTreeRoot(Vertex v){
+		System.out.println(this.workingGraph.toString());
 		int size = 0;
 		for(Edge e : v.getEdges(Direction.IN)) {
-			if (this.edgeBucket.contains(e)) { size++;}
+			for(Edge ee : this.edgeBucket) {
+				if (ee.getVertex(Direction.IN).equals(e.getVertex(Direction.IN)) 
+				 	&& ee.getVertex(Direction.OUT).equals(e.getVertex(Direction.OUT))) { 
+					//System.out.println(" => " + this.edgeToString(e));
+					size++;
+				}
+			}
 		}
 		return (size == 0);
 	}
@@ -780,8 +817,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		this.addProperty("BE", sBE);
 		this.setOutput(g);
 
-		System.out.println("SETS:\nV: "+sV+"\nBV: "+sBV+"\nBE: "+sBE + "\nC: "+sC);
-
+		//System.out.println("SETS:\nV: "+sV+"\nBV: "+sBV+"\nBE: "+sBE + "\nC: "+sC);
 	}
 }
 

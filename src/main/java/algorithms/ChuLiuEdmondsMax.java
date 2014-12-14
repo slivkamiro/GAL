@@ -2,8 +2,9 @@ package algorithms;
 
 import java.util.Iterator;
 
+import model.GraphAdapter;
+
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
 
 public class ChuLiuEdmondsMax extends ChuLiuEdmonds {
 
@@ -12,9 +13,9 @@ public class ChuLiuEdmondsMax extends ChuLiuEdmonds {
 		super.setBranching(Branching.MAX);
 	}
 	
-	public ChuLiuEdmondsMax(Graph g){
+	public ChuLiuEdmondsMax(GraphAdapter g){
 		this();
-		this.workingGraph = g;
+		super.setGraph(g);
 	}
 	
 	@Override
