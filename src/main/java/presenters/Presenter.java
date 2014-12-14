@@ -10,19 +10,37 @@ import views.EditEdge;
 import views.EditVertex;
 import views.Message;
 
+/**
+ *
+ * @author Miroslav
+ *
+ */
 public abstract class Presenter {
 
 	private JApplet view;
 
+	/**
+	 *
+	 * @author Miroslav
+	 * Enumeration of dialogs that this presenter can show.
+	 */
 	public enum Dialogs {
 		EDIT_VERTEX,
 		EDIT_EDGE,
 		MESSAGE
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public Presenter() {
 	}
 
+	/**
+	 * Displays dialog specified.
+	 * @param d Dialog to be displayed.
+	 * @param o Object to be presented.
+	 */
 	public void populateDialog(Dialogs d,Object o) {
 		switch (d) {
 		case EDIT_VERTEX:
@@ -40,8 +58,8 @@ public abstract class Presenter {
 			p.setView(eeditView);
 			p.setEdge((EdgeAdapter) o);
 			eeditView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-			eeditView.setVisible(true);
 			p.show();
+			eeditView.setVisible(true);
 			break;
 		case MESSAGE:
 			Message m = new Message(o.toString());
@@ -53,8 +71,12 @@ public abstract class Presenter {
 		}
 	}
 
-	public void setView(JApplet view) {
+	/**
+	 * Sets view to this presenter.
+	 * @param view
+	 */
+	/*public void setView(JApplet view) {
 		this.view = view;
 	}
-
+	 */
 }

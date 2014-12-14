@@ -11,13 +11,41 @@ import model.GraphAdapter;
 import algorithms.Algorithm;
 import algorithms.AlgorithmManager;
 
-
+/**
+ *
+ * @author Miroslav
+ *
+ */
 public class DemoPresenter extends Presenter implements Observer {
 
+	/**
+	 *
+	 * @author Miroslav
+	 * Interface that every view that this presenter manage must implement.
+	 */
 	public interface Demonstrator {
+
+		/**
+		 * Publish events.
+		 * @param ev
+		 */
 		public void addEvent(String ev);
+
+		/**
+		 * Clear published events.
+		 */
 		public void clearEvents();
+
+		/**
+		 * Publish graph.
+		 * @param graph
+		 */
 		public void setGraph(GraphAdapter graph);
+
+		/**
+		 * Gets algorithm to be demonstrated.
+		 * @return
+		 */
 		public String getSelectedAlgorithm();
 	}
 
@@ -38,6 +66,10 @@ public class DemoPresenter extends Presenter implements Observer {
 	private AlgorithmManager algManager;
 	private Algorithm alg = null;
 
+	/**
+	 * Constructor.
+	 * @param d View that this presenter manages.
+	 */
 	public DemoPresenter(Demonstrator d) {
 		super();
 		demonstrator = d;
@@ -48,6 +80,16 @@ public class DemoPresenter extends Presenter implements Observer {
 		presentGraph = null;
 	}
 
+	/**
+	 * Initialize algorithm to be demonstrated.
+	 * @param graph Graph that algorithm should be demonstrated on.
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
 	public void start(GraphAdapter graph) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		// Called on demo button selected/deselected
 		if(alg == null) {
@@ -55,13 +97,16 @@ public class DemoPresenter extends Presenter implements Observer {
 			alg.addObserver(this);
 			presentGraph = graph;
 			//history.push(graph);
-			alg.setGraph(graph.getGraph());
+			alg.setGraph(graph);
 		} else {
 			stopDemo();
 		}
 
 	}
 
+	/**
+	 * Stops demonstration.
+	 */
 	public void stopDemo() {
 		if(alg != null) {
 			alg.deleteObserver(this);
@@ -81,6 +126,9 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	}
 
+	/**
+	 * Do one step of algorithm.
+	 */
 	public void stepForward() {
 		if (alg != null) {
 			if (!future.empty()) {
@@ -94,6 +142,9 @@ public class DemoPresenter extends Presenter implements Observer {
 		}
 	}
 
+	/**
+	 * Do one step back in algorithm.
+	 */
 	public void stepBackward() {
 		if (!history.empty()) {
 			future.push(presentGraph);
@@ -111,7 +162,7 @@ public class DemoPresenter extends Presenter implements Observer {
 			demonstrator.setGraph(presentGraph);
 			StringBuilder event = new StringBuilder();
 			for(String key : this.alg.getPropertiesName()) {
-				event.append(key+" ");
+				event.append(key+": ");
 				event.append(this.alg.getProperty(key)+"\n");
 			}
 			this.alg.clearProperties();
@@ -120,6 +171,10 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	}
 
+	/**
+	 * Gets all known algorithms.
+	 * @return Array of objects that holds names of algorithms.
+	 */
 	public Object[] getAlgorithms() {
 		return algManager.getAlgorithms().toArray();
 	}

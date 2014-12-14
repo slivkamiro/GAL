@@ -76,10 +76,90 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 	private void initComponents() {
 
-		JMenuBar menuBar = new JMenuBar();
+		// initialization
 
+		// menu
+		JMenuBar menuBar = new JMenuBar();
 		JMenu mnFile = new JMenu("File");
+		JMenuItem mntmOpen = new JMenuItem("Open");
+		JMenuItem mntmSave = new JMenuItem("Save");
+
 		menuBar.add(mnFile);
+		mnFile.add(mntmOpen);
+		mnFile.add(mntmSave);
+		setJMenuBar(menuBar);
+
+		// toolbar
+		JToolBar toolBar = new JToolBar();
+		MyButtonGroup eGrp = new MyButtonGroup();
+		JToggleButton tglbtnVertex = new JToggleButton("Vertex");
+		JToggleButton tglbtnEdge = new JToggleButton("Edge");
+		JToggleButton tglbtnEdit = new JToggleButton("Edit");
+		JToggleButton tglbtnRemove = new JToggleButton("Remove");
+		JButton btnClear = new JButton("Clear");
+		JToggleButton btnDemo = new JToggleButton("Demo");
+		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
+		algorithms.setMaximumSize(new Dimension(100,22));
+		algorithms.setPreferredSize(new Dimension(100,22));
+		algorithms.setMinimumSize(new Dimension(100,22));
+		algorithms.setSelectedIndex(0);
+		JButton btnBwd = new JButton();
+		btnBwd.setIcon(new ImageIcon(this.getClass().getResource("icons/bwd.png")));
+		JButton btnFwd = new JButton();
+		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
+
+		eGrp.add(tglbtnVertex);
+		eGrp.add(tglbtnEdge);
+		eGrp.add(tglbtnEdit);
+		eGrp.add(tglbtnRemove);
+		eGrp.add(btnDemo);
+
+		toolBar.add(tglbtnVertex);
+		toolBar.add(tglbtnEdge);
+		toolBar.add(tglbtnEdit);
+		toolBar.add(tglbtnRemove);
+		toolBar.add(btnClear);
+		toolBar.addSeparator();
+		toolBar.add(btnDemo);
+		toolBar.add(algorithms);
+		toolBar.add(btnBwd);
+		toolBar.add(btnFwd);
+		getContentPane().add(toolBar, BorderLayout.NORTH);
+
+		// workspace
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setResizeWeight(0.75);
+		splitPane.setEnabled(false);
+
+		JScrollPane scrollPaneL = new JScrollPane();
+		JScrollPane scrollPaneR = new JScrollPane();
+
+		splitPane.setLeftComponent(scrollPaneL);
+		splitPane.setRightComponent(scrollPaneR);
+
+		// events on the right
+		JPanel panel = new JPanel();
+		scrollPaneR.setViewportView(panel);
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+		eventArea = new JTextArea();
+		eventArea.setForeground(SystemColor.BLACK);
+		eventArea.setBackground(SystemColor.control);
+		eventArea.setEditable(false);
+		panel.add(eventArea);
+
+		// graph on the left
+		gPresenter = new GraphPresenter();
+		canvas = new Canvas(gPresenter);
+		canvas.setBackground(Color.WHITE);
+		scrollPaneL.setViewportView(canvas);
+		//gPresenter.setView(this);
+		gPresenter.setView(canvas);
+
+		canvas.requestFocus();
+		getContentPane().add(splitPane, BorderLayout.CENTER);
+
+		// Actions
 
 		// Set file filter to xml only - graphML
 		final JFileChooser fc = new JFileChooser();
@@ -98,7 +178,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		});
 
-		JMenuItem mntmOpen = new JMenuItem("Open");
+		// Open file
 		mntmOpen.addActionListener(new ActionListener() {
 
 			@Override
@@ -111,9 +191,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		mnFile.add(mntmOpen);
 
-		JMenuItem mntmSave = new JMenuItem("Save");
+		// Save file
 		mntmSave.addActionListener(new ActionListener() {
 
 			@Override
@@ -127,14 +206,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		mnFile.add(mntmSave);
-		// Add to applet
-		setJMenuBar(menuBar);
-
-		JToolBar toolBar = new JToolBar();
 
 		// Creating vertex - stop demonstration if running
-		JToggleButton tglbtnVertex = new JToggleButton("Vertex");
 		tglbtnVertex.addActionListener(new ActionListener() {
 
 			@Override
@@ -144,10 +217,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(tglbtnVertex);
 
 		// Creating edge - stop demonstration if running
-		JToggleButton tglbtnEdge = new JToggleButton("Edge");
 		tglbtnEdge.addActionListener(new ActionListener() {
 
 			@Override
@@ -157,10 +228,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(tglbtnEdge);
 
 		// Editing - stop demonstration if running
-		JToggleButton tglbtnEdit = new JToggleButton("Edit");
 		tglbtnEdit.addActionListener(new ActionListener() {
 
 			@Override
@@ -170,10 +239,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(tglbtnEdit);
 
 		// Removing - stop demonstration if running
-		JToggleButton tglbtnRemove = new JToggleButton("Remove");
 		tglbtnRemove.addActionListener(new ActionListener() {
 
 			@Override
@@ -183,18 +250,20 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(tglbtnRemove);
 
-		MyButtonGroup eGrp = new MyButtonGroup();
-		eGrp.add(tglbtnVertex);
-		eGrp.add(tglbtnEdge);
-		eGrp.add(tglbtnEdit);
-		eGrp.add(tglbtnRemove);
+		// Clear workspace - stop demonstration and unselect demo button
+		btnClear.addActionListener(new ActionListener() {
 
-		toolBar.addSeparator();
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				presenter.stopDemo();
+				btnDemo.setSelected(false);
+				gPresenter.setGraph(new GraphAdapter());
+			}
 
-		// Demonstration start - initialize algorithm
-		JToggleButton btnDemo = new JToggleButton("Demo");
+		});
+
+		// Demonstration start - initialize algorithm with graph
 		btnDemo.addActionListener(new ActionListener() {
 
 			@Override
@@ -213,20 +282,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 		});
 
-		eGrp.add(btnDemo);
-
-		toolBar.add(btnDemo);
-
-		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
-		algorithms.setMaximumSize(new Dimension(100,22));
-		algorithms.setPreferredSize(new Dimension(100,22));
-		algorithms.setMinimumSize(new Dimension(100,22));
-		algorithms.setSelectedIndex(0);
-		toolBar.add(algorithms);
-
 		// Demonstration step back
-		JButton btnBwd = new JButton();
-		btnBwd.setIcon(new ImageIcon(this.getClass().getResource("icons/bwd.png")));
 		btnBwd.addActionListener(new ActionListener() {
 
 			@Override
@@ -236,11 +292,8 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(btnBwd);
 
 		// Demonstration step forward
-		JButton btnFwd = new JButton();
-		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
 		btnFwd.addActionListener(new ActionListener() {
 
 			@Override
@@ -250,41 +303,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			}
 
 		});
-		toolBar.add(btnFwd);
-		// Add to applet
-		getContentPane().add(toolBar, BorderLayout.NORTH);
 
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setResizeWeight(1.0);
-		splitPane.setEnabled(false);
-
-		JScrollPane scrollPaneL = new JScrollPane();
-		splitPane.setLeftComponent(scrollPaneL);
-		JScrollPane scrollPaneR = new JScrollPane();
-		splitPane.setRightComponent(scrollPaneR);
-
-		JPanel panel = new JPanel();
-		scrollPaneR.setViewportView(panel);
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-
-		eventArea = new JTextArea();
-		eventArea.setForeground(SystemColor.controlShadow);
-		eventArea.setBackground(SystemColor.control);
-		eventArea.setEditable(false);
-		eventArea.setRows(10);
-		eventArea.setColumns(30);
-		panel.add(eventArea);
-
-		gPresenter = new GraphPresenter();
-		canvas = new Canvas(gPresenter);
-		canvas.setBackground(Color.WHITE);
-		scrollPaneL.setViewportView(canvas);
-		gPresenter.setView(this);
-		gPresenter.setView(canvas);
-
-		canvas.requestFocus();
-		// Add to applet
-		getContentPane().add(splitPane, BorderLayout.CENTER);
 
 	}
 

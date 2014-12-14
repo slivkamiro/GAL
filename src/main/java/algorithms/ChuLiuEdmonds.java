@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import model.GraphAdapter;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -69,7 +71,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	 */
 	public ChuLiuEdmonds(Graph graph) {
 		this();
-		this.setGraph(graph);
+		this.setGraph(new GraphAdapter(graph));
 	}
 
 	/**
@@ -102,11 +104,11 @@ public class ChuLiuEdmonds extends Algorithm {
 	 * @param g
 	 */
 	@Override
-	public void setGraph(Graph g){
-		this.workingGraph = g;
+	public void setGraph(GraphAdapter g){
+		this.workingGraph = g.getGraph();
 
 		// Iterable to set
-		for (Vertex v : g.getVertices()) {
+		for (Vertex v : workingGraph.getVertices()) {
 			this.vertices.add(v);
 		}
 	}
@@ -134,12 +136,12 @@ public class ChuLiuEdmonds extends Algorithm {
 	 */
 	@Override
 	public void doStep() {
-		
+
 		if (this.doneFlag){
 			this.setOutput((Graph)null);
 			return;
 		}
-		
+
 		if (this.cycleToShrink){
 			reconstructWorkingGraph();
 			updateBuckets();
@@ -205,7 +207,7 @@ public class ChuLiuEdmonds extends Algorithm {
 				// public BE with cycle - difference from algorithm
 				this.publishSubGraph();
 			}
-			
+
 			this.edgeBucket.add(e);
 			e.setProperty("bucket", true);
 		}
@@ -717,7 +719,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			vertexIn = null;
 			vertexOut = null;
 		}
-		
+
 		// add edges from BV - root can be in BV without edges in BE
 		for (Vertex v : this.vertexBucket){
 			vertexIn = g.getVertex(v.getId());
@@ -730,7 +732,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			vertexIn = null;
 
 		}
-		
+
 		int i = 0;
 		String sV = "";
 		for (Vertex v : this.vertices){
@@ -740,7 +742,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			i++;
 		}
-		
+
 		String sBV = "";
 		i = 0;
 		for (Vertex v : this.vertexBucket){
@@ -750,7 +752,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			i++;
 		}
-		
+
 		String sBE = "";
 		i = 0;
 		for (Edge e : this.edgeBucket){
@@ -760,7 +762,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			i++;
 		}
-		
+
 		String sC = "";
 		if (this.cycleToShrink) {
 			i = 0;
@@ -777,9 +779,9 @@ public class ChuLiuEdmonds extends Algorithm {
 		this.addProperty("BV", sBV);
 		this.addProperty("BE", sBE);
 		this.setOutput(g);
-		
+
 		System.out.println("SETS:\nV: "+sV+"\nBV: "+sBV+"\nBE: "+sBE + "\nC: "+sC);
-		
+
 	}
 }
 

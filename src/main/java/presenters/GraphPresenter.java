@@ -18,23 +18,76 @@ import model.GraphAdapter;
 import model.VertexAdapter;
 import views.CanvasObject;
 
+/**
+ *
+ * @author Miroslav
+ *
+ */
 public class GraphPresenter extends Presenter {
 
+	/**
+	 *
+	 * @author Miroslav
+	 * Interface that must implement every View that this presenter manages.
+	 */
 	public interface GraphEditor {
+
+		/**
+		 * Draw canvas object specified.
+		 * @param o
+		 */
 		public void drawObject(CanvasObject o);
 		//public void drawShape(final Shape s);
 		//public void drawDirectedEdge(Point p1, Point p2);
+
+		/**
+		 * Edit canvas object specified.
+		 * @param o
+		 */
 		public void editObject(CanvasObject o);
+
+		/**
+		 * Remove object painted to graph on position specified.
+		 * @param p position
+		 */
 		public void removeObjectCloseTo(Point p);
+
+		/**
+		 * Remove last object painted.
+		 */
 		public void removeLast();
 		//public void removeVertexCloseTo(Point p);
 		//public void removeEdgeCloseTo(Point p);
+
+		/**
+		 * Move with vertex on position.
+		 * @param p position.
+		 */
 		public void moveVertex(Point p);
+
+		/**
+		 * Gets all object from canvas.
+		 * @return list of canvas objects.
+		 */
 		public List<CanvasObject> getObjects();
+
+		/**
+		 * Set objects to be painted.
+		 * @param objects list of canvas objects.
+		 */
 		public void setObjects(List<CanvasObject> objects);
+
+		/**
+		 * Clean canvas.
+		 */
 		public void clean();
 	}
 
+	/**
+	 *
+	 * @author Miroslav
+	 * Enumeration of modes of graph editor. NONE means that application is not in editing mode.
+	 */
 	public enum EditorOptions {
 		VERTEX,
 		EDGE,
@@ -52,15 +105,26 @@ public class GraphPresenter extends Presenter {
 	private Point start;
 	private Point end;
 
+	/**
+	 * Default constructor. Present empty graph.
+	 */
 	public GraphPresenter() {
 		super();
 		graph = new GraphAdapter();
 	}
 
+	/**
+	 * Sets view to this presenter.
+	 * @param editor
+	 */
 	public void setView(GraphEditor editor) {
 		this.editor = editor;
 	}
 
+	/**
+	 * Where user releases mouse button.
+	 * @param point
+	 */
 	public void endPoint(Point point) {
 		switch (mode) {
 		case EDGE:
@@ -92,6 +156,10 @@ public class GraphPresenter extends Presenter {
 
 	}
 
+	/**
+	 * Where user pressed mouse button.
+	 * @param point
+	 */
 	public void startPoint(Point point) {
 		VertexAdapter v = null;
 		EdgeAdapter e = null;
@@ -168,10 +236,18 @@ public class GraphPresenter extends Presenter {
 		return e;
 	}
 
+	/**
+	 * Sets editor mode specified. Or unset if called second time with same mode option.
+	 * @param mode Mode of the editor to be set.
+	 */
 	public void setEditor(EditorOptions mode) {
 		this.mode = this.mode == mode ? EditorOptions.NONE : mode;
 	}
 
+	/**
+	 * Where the mouse pointer is right now when mouse button is pressed.
+	 * @param point
+	 */
 	public void possibleEndPoint(Point point) {
 		switch (mode) {
 		case EDGE:
@@ -192,6 +268,11 @@ public class GraphPresenter extends Presenter {
 
 	}
 
+	/**
+	 * Gets vertex near position specified.
+	 * @param point specifies position.
+	 * @return Vertex near that position.
+	 */
 	public VertexAdapter getVertexOnPosition(Point2D point) {
 		Point p = new Point();
 		p.x = (int)point.getX();
@@ -199,6 +280,11 @@ public class GraphPresenter extends Presenter {
 		return getVertexOnPosition(p);
 	}
 
+	/**
+	 * Gets vertex near position specified.
+	 * @param p specifies position.
+	 * @return Vertex near that position.
+	 */
 	public VertexAdapter getVertexOnPosition(Point p) {
 		for (VertexAdapter v : graph.getVertices()) {
 			int x = Integer.parseInt(v.getAttribute("PositionX"));
@@ -210,10 +296,18 @@ public class GraphPresenter extends Presenter {
 		return null;
 	}
 
+	/**
+	 * Gets graph that is presented.
+	 * @return graph
+	 */
 	public GraphAdapter getGraph() {
 		return graph;
 	}
 
+	/**
+	 * Sets graph to be presented.
+	 * @param graph
+	 */
 	public void setGraph(GraphAdapter graph) {
 		this.graph = graph;
 		editor.clean();
@@ -221,6 +315,10 @@ public class GraphPresenter extends Presenter {
 
 	}
 
+	/**
+	 * Set graph to be presented from file.
+	 * @param f file that holds definition of graph in graphml format.
+	 */
 	public void setGraph(File f) {
 		GraphAdapter s = graph;
 		editor.clean();
@@ -238,6 +336,10 @@ public class GraphPresenter extends Presenter {
 
 	}
 
+	/**
+	 * Saves graph to a file in graphml format.
+	 * @param f output file.
+	 */
 	public void saveGraph(File f) {
 		try {
 			graph.write(f);

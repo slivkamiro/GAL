@@ -15,36 +15,71 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
+/**
+ *
+ * @author Miroslav
+ * Serves as adapter to model's vertex.
+ */
 public class VertexAdapter extends CanvasObject{
 
 	private Vertex v;
 
+	/**
+	 * Creates new VertexAdapter that holds model's vertex.
+	 * @param v model's vertex
+	 */
 	public VertexAdapter(Vertex v) {
 		super();
 		this.v = v;
 		this.setLabel(v.getId().toString());
 	}
 
+	/**
+	 * Gets model's vertex.
+	 * @return model's vertex.
+	 */
 	public Vertex getVertex() {
 		return v;
 	}
 
+	/**
+	 * Adds edge with this vertex as origin.
+	 * @param e edge to be added wrapped in edge adapter.
+	 */
 	public void addEdge(EdgeAdapter e) {
 		v.addEdge("1", e.getInVertex().getVertex());
 	}
 
+	/**
+	 * Sets attribute of the vertex. Used for position on canvas.
+	 * @param name Attribute name.
+	 * @param value Attribute value.
+	 */
 	public void setAttribute(String name, String value) {
 		v.setProperty(name,value);
 	}
 
+	/**
+	 * Gets attribute with name specified.
+	 * @param name Name of the attribute.
+	 * @return
+	 */
 	public String getAttribute(String name) {
 		return v.getProperty(name).toString();
 	}
 
+	/**
+	 * Gets vertex id.
+	 * @return string id. Will be number.
+	 */
 	public String getId() {
 		return (String) v.getId();
 	}
 
+	/**
+	 * Gets all attributes that this vertex has.
+	 * @return Map of string keys and string attributes.
+	 */
 	public Map<String,String> getAttributes() {
 		Map<String,String> attributes = new HashMap<String,String>();
 		for (String key : v.getPropertyKeys()) {
@@ -53,6 +88,10 @@ public class VertexAdapter extends CanvasObject{
 		return attributes;
 	}
 
+	/**
+	 * Gets all edges that originate in this vertex or this vertex is it's destination.
+	 * @return List of edges wrapped in EdgeAdapter.
+	 */
 	public List<EdgeAdapter> getEdges() {
 		List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
 		for (Edge e : v.getEdges(Direction.BOTH, "1")) {
@@ -61,6 +100,10 @@ public class VertexAdapter extends CanvasObject{
 		return edges;
 	}
 
+	/**
+	 * Removes attribute with name given.
+	 * @param k Name of the attribute to be removed.
+	 */
 	public void deleteAttribute(String k) {
 		v.removeProperty(k);
 

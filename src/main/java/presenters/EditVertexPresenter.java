@@ -7,11 +7,36 @@ import java.util.Map;
 
 import model.VertexAdapter;
 
+/**
+ *
+ * @author Miroslav
+ *
+ */
 public class EditVertexPresenter extends Presenter {
 
+	/**
+	 *
+	 * @author Miroslav
+	 * Interface that must implement every View that this presenter manages.
+	 */
 	public interface VertexEditor {
+
+		/**
+		 * Display properties of specified vertex.
+		 * @param v vertex.
+		 */
 		public void showVertexProp(VertexAdapter v);
+
+		/**
+		 * Add property to list.
+		 * @param s string property name and value separated by :.
+		 */
 		public void addToList(String s);
+
+		/**
+		 * Remove property from a list.
+		 * @param s string property name and value separated by :.
+		 */
 		public void removeFromList(String s);
 	}
 
@@ -21,24 +46,43 @@ public class EditVertexPresenter extends Presenter {
 	private Map<String,String> newAttrs;
 	private List<String> toRemove;
 
+	/**
+	 * Default constructor.
+	 */
 	public EditVertexPresenter() {
 		super();
 		newAttrs = new HashMap<String,String>();
 		toRemove = new ArrayList<String>();
 	}
 
+	/**
+	 * Sets view to this presenter.
+	 * @param view
+	 */
 	public void setView(VertexEditor view) {
 		editor = view;
 	}
 
+	/**
+	 * Set vertex to be presented.
+	 * @param o Vertex to be presented.
+	 */
 	public void setVertex(VertexAdapter o) {
 		vertex = o;
 	}
 
+	/**
+	 * Displays vertex properties.
+	 */
 	public void show() {
 		editor.showVertexProp(vertex);
 	}
 
+	/**
+	 * Adds new attribute to the vertex.
+	 * @param name Name of new attribute.
+	 * @param value Value of new attribute.
+	 */
 	public void addAttribute(String name, String value) {
 		if (name != "" && value != "") {
 			newAttrs.put(name, value);
@@ -46,6 +90,10 @@ public class EditVertexPresenter extends Presenter {
 		}
 	}
 
+	/**
+	 * Removes specified attribute.
+	 * @param selectedValue Name of the attribute to be removed.
+	 */
 	public void removeAttribute(String selectedValue) {
 		// TODO do not remove position attributes
 		editor.removeFromList(selectedValue);
@@ -63,6 +111,9 @@ public class EditVertexPresenter extends Presenter {
 
 	}
 
+	/**
+	 * Save changes made to this vertex.
+	 */
 	public void saveChanges() {
 		for (String k : newAttrs.keySet()) {
 			vertex.setAttribute(k, newAttrs.get(k));
