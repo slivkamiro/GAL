@@ -26,6 +26,8 @@ public class ChuLiuEdmonds extends Algorithm {
 	private Phase phase;
 	private Branching branching;
 
+	private Integer weightOffset;
+	
 	private Vertex root;
 	private Graph workingGraph;
 	private Vertex cycleVertex;
@@ -48,6 +50,8 @@ public class ChuLiuEdmonds extends Algorithm {
 		this.branching = Branching.MIN; // NOT IMPLEMENTED - only MIN is default
 		this.doneFlag = false;
 		this.cycleToShrink = false;
+		
+		this.weightOffset = 0;
 
 		this.root = null;
 		this.phase = Phase.A;
@@ -81,7 +85,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		this(graph);
 		this.branching = b;
 	}
-
+	
 	/**
 	 * Constructor.
 	 * @param graph
@@ -109,8 +113,36 @@ public class ChuLiuEdmonds extends Algorithm {
 		for (Vertex v : g.getVertices()) {
 			this.vertices.add(v);
 		}
+		
+		// TODO
+		if (this.branching == Branching.MIN){
+			System.out.println("Modifying edges");
+			this.modifyWeights();
+		}
 	}
 
+	private void modifyWeights(){
+		// find edge with max. weight in graph
+		Iterator<Edge> it = this.workingGraph.getEdges().iterator();
+		Integer maxWeight = it.hasNext() ? Integer.parseInt((String)it.next().getProperty("weight")) : 0;
+
+		while (it.hasNext()){
+			Integer w = Integer.parseInt((String)it.next().getProperty("weight"));
+			if (w > maxWeight){
+				maxWeight = w;
+			}
+		}
+		this.weightOffset = maxWeight+1;
+		
+		// modify values of all edges
+		for (Edge e : this.workingGraph.getEdges()){
+			Integer w = Integer.parseInt((String)e.getProperty("weight"));
+			w = w - 2*w; // lets make them negative
+			w = w + this.weightOffset; 
+			e.setProperty("weight", ""+w);
+			System.out.println("New weight: w"+this.edgeToString(e)+" = " + w);
+		}
+	}
 
 	/** Execute algorithm - all steps */
 	public void execute(){
@@ -151,7 +183,9 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 
 		publishSubGraph();
-
+		// debug
+		printStatus();
+		
 		if (this.vertices.size() == 0 &&  !this.cycleToShrink ){
 			this.phase = Phase.B;
 		}
@@ -180,8 +214,9 @@ public class ChuLiuEdmonds extends Algorithm {
 			// debug
 			System.out.println("  vert id : " + (String) v.getId());
 
-			e = getMinIncomingEdge(v);
-
+			//e = getMinIncomingEdge(v);
+			e = this.getMaxIncomingEdge(v);
+			
 			if ( e == null )
 				return;
 
@@ -281,8 +316,12 @@ public class ChuLiuEdmonds extends Algorithm {
 				// TODO
 				Integer oldWeight = Integer.parseInt((String)e.getProperty("weight"));
 				Integer cycleEdgeWeight = getCycleInnerEdgeWeight(e.getVertex(Direction.IN));
-				Integer newWeight = oldWeight - cycleEdgeWeight;
-				System.out.print(edgeToString(newEdge) + " c="+newWeight+" ["+oldWeight+" - "+cycleEdgeWeight+"]\n");
+				Integer cycleMinWeight = getCycleMaxWeight(); // new
+				
+				Integer newWeight = oldWeight - cycleEdgeWeight + cycleMinWeight; // new
+				System.out.print(edgeToString(newEdge) + " c="+newWeight+" ["+oldWeight+" - "+cycleEdgeWeight+" + "+cycleMinWeight+"]\n");
+				
+				
 				newEdge.setProperty("weight", ""+newWeight);
 			}
 			else{
@@ -298,6 +337,21 @@ public class ChuLiuEdmonds extends Algorithm {
 		// set Gi as working graph and update BE
 		this.workingGraph = g;
 		this.edgeBucket = newEdgeBucket;
+	}
+	
+	/** Find max. weight in cycle edges. */
+	private Integer getCycleMaxWeight(){
+		Iterator<Edge> it = this.cycle.iterator();
+		Integer minWeight = Integer.parseInt((String)it.next().getProperty("weight"));
+
+		while (it.hasNext()){
+			Integer w = Integer.parseInt((String)it.next().getProperty("weight"));
+			if (w < minWeight){
+				minWeight = w;
+			}
+		}
+		
+		return minWeight;
 	}
 
 	/** Get inner edge of cycle which is incident to vertex v. */
@@ -355,8 +409,8 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 		}
 		System.out.print(s);
-
-		return minWeight <= 0 ? null : edge;
+		// TODO  minWeight <= 0 ???
+		return minWeight < 0 ? null : edge;
 	}
 
 	/** Get incident edge of vertex v with max. weight */
@@ -364,9 +418,11 @@ public class ChuLiuEdmonds extends Algorithm {
 		Edge edge = null;
 		Integer maxWeight = 0;
 
+		String s = "";
 		for ( Edge e : v.getEdges(Direction.IN) ){
-			Integer w = (Integer)e.getProperty("weight");
-
+			Integer w = Integer.parseInt((String)e.getProperty("weight"));
+			s += edgeToString(e) + " c="+w+"\n";
+			
 			if (edge == null){
 				maxWeight = w;
 				edge = e;
@@ -378,7 +434,9 @@ public class ChuLiuEdmonds extends Algorithm {
 				edge = e;
 			}
 		}
-		return maxWeight <= 0 ? null : edge;
+		System.out.print(s);
+		// TODO minWeight <= 0 ???
+		return maxWeight < 0 ? null : edge;
 	}
 
 	/** getCycle wrapper - call DFS to find cycle in BE */
@@ -710,7 +768,15 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 
 			vertexIn = null;
-
+		}
+		
+		// modify edge weights if MIN branching
+		if (this.branching == Branching.MIN){
+			for (Edge e : g.getEdges()){
+				Integer ew = Integer.parseInt((String)e.getProperty("weight"));
+				ew  = Math.abs(ew - this.weightOffset);
+				e.setProperty("weight", ""+ew);
+			}
 		}
 		
 		int i = 0;
