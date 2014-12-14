@@ -151,6 +151,8 @@ public class ChuLiuEdmonds extends Algorithm {
 		}
 
 		publishSubGraph();
+		// debug
+		printStatus();
 
 		if (this.vertices.size() == 0 &&  !this.cycleToShrink ){
 			this.phase = Phase.B;
@@ -180,7 +182,8 @@ public class ChuLiuEdmonds extends Algorithm {
 			// debug
 			System.out.println("  vert id : " + (String) v.getId());
 
-			e = getMinIncomingEdge(v);
+			// min or max
+			e = getIncomingEdge(v);
 
 			if ( e == null )
 				return;
@@ -198,15 +201,16 @@ public class ChuLiuEdmonds extends Algorithm {
 				// public BE with cycle - difference from algorithm
 				this.publishSubGraph();
 			}
-			// TODO - change in alg. - edge {e} is added to BE only if there was not cycle
-
-			//if (this.cycle.size() == 0){
-				this.edgeBucket.add(e);
-			//}
-
+			
+			this.edgeBucket.add(e);
+			e.setProperty("bucket", true);
 		}
 	}
 
+	protected Edge getIncomingEdge(Vertex v) {
+		return  (this.branching == Branching.MIN) ? getMinIncomingEdge(v) : getMaxIncomingEdge(v);
+	}
+	
 	/** Reconstruct graph:
 	 * - create graph Gi
 	 * - contains cycle node Ci - overlaying cycle nodes from Gi-1
@@ -278,11 +282,13 @@ public class ChuLiuEdmonds extends Algorithm {
 			else if (this.cycleVertices.contains(e.getVertex(Direction.IN))){
 				// add edge of type (x, ui)
 				newEdge = outV.addEdge(e.getLabel(), cycleVertex);
-				// TODO
+				
 				Integer oldWeight = Integer.parseInt((String)e.getProperty("weight"));
 				Integer cycleEdgeWeight = getCycleInnerEdgeWeight(e.getVertex(Direction.IN));
-				Integer newWeight = oldWeight - cycleEdgeWeight;
-				System.out.print(edgeToString(newEdge) + " c="+newWeight+" ["+oldWeight+" - "+cycleEdgeWeight+"]\n");
+				
+				System.out.print(edgeToString(newEdge) + " c=");
+				Integer newWeight = this.recalculateWeight(oldWeight, cycleEdgeWeight);
+				
 				newEdge.setProperty("weight", ""+newWeight);
 			}
 			else{
@@ -292,6 +298,7 @@ public class ChuLiuEdmonds extends Algorithm {
 			}
 			if (wasInBucket){
 				newEdgeBucket.add(newEdge);
+				newEdge.setProperty("bucket", true);
 			}
 		}
 
@@ -300,6 +307,11 @@ public class ChuLiuEdmonds extends Algorithm {
 		this.edgeBucket = newEdgeBucket;
 	}
 
+	protected Integer recalculateWeight(Integer oldWeight, Integer cycleEdgeWeight){
+		System.out.print(" ["+oldWeight+" - "+cycleEdgeWeight+"]\n");
+		return oldWeight - cycleEdgeWeight;
+	}
+	
 	/** Get inner edge of cycle which is incident to vertex v. */
 	private Integer getCycleInnerEdgeWeight(Vertex v){
 		for (Edge e : this.cycle){
@@ -522,9 +534,10 @@ public class ChuLiuEdmonds extends Algorithm {
 
 				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
+					System.out.println("Reconstruction (ui,x) : " + this.edgeToString(ee));
 					Object tmpInId = ee.getVertex(Direction.IN).getId();
 					ov = ee.getVertex(Direction.OUT);
-					if (this.cycleVertices.contains(ov) && tmpInId.equals(inId)){
+					if (this.cycleVertices.contains(ov) && tmpInId.equals(inId) && ee.getProperty("bucket") != null){
 						weight = ee.getProperty("weight");
 						break;
 					}
@@ -532,6 +545,7 @@ public class ChuLiuEdmonds extends Algorithm {
 
 				newEdge =  g.getVertex(ov.getId()).addEdge(e.getLabel(), inV);
 				newEdge.setProperty("weight", weight);
+				System.out.println("Equivalent  in   Gi-1 : " + this.edgeToString(newEdge));
 			}
 			else {
 				newEdge = outV.addEdge(e.getLabel(), inV);

@@ -12,6 +12,7 @@ public class AlgorithmManager {
 	public AlgorithmManager() {
 		algorithms = new ArrayList<Class<?>>();
 		algorithms.add(ChuLiuEdmonds.class);
+		algorithms.add(ChuLiuEdmondsMax.class);
 		// New algorithms have to be added here
 	}
 
