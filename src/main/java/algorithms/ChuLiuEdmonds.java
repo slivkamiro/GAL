@@ -18,7 +18,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		B 	// expand cycle nodes
 	};
 
-	private enum Branching {
+	public enum Branching {
 		MIN,	// minimum branching
 		MAX 	// maximum branching
 	};
@@ -34,7 +34,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	private Set<Vertex> vertexBucket;// BV
 	private Set<Edge> edgeBucket;	 // BE
 
-	private Set<Edge> cycle;
+	protected Set<Edge> cycle;
 	private Set<Vertex> cycleVertices;
 
 	private Vector<Graph> workingGraphs;
@@ -110,6 +110,10 @@ public class ChuLiuEdmonds extends Algorithm {
 			this.vertices.add(v);
 		}
 	}
+	
+	public void setBranching(Branching b) {
+		this.branching = b;
+	};
 
 
 	/** Execute algorithm - all steps */
@@ -377,7 +381,7 @@ public class ChuLiuEdmonds extends Algorithm {
 		Integer maxWeight = 0;
 
 		for ( Edge e : v.getEdges(Direction.IN) ){
-			Integer w = (Integer)e.getProperty("weight");
+			Integer w = Integer.parseInt((String)e.getProperty("weight"));
 
 			if (edge == null){
 				maxWeight = w;
