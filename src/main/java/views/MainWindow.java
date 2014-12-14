@@ -32,6 +32,7 @@ import model.GraphAdapter;
 import presenters.DemoPresenter;
 import presenters.DemoPresenter.Demonstrator;
 import presenters.GraphPresenter;
+import presenters.Presenter.Dialogs;
 import utils.MyButtonGroup;
 
 public class MainWindow extends JApplet implements Demonstrator {
@@ -99,14 +100,15 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JButton btnClear = new JButton("Clear");
 		final JToggleButton btnDemo = new JToggleButton("Demo");
 		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
-		algorithms.setMaximumSize(new Dimension(100,22));
-		algorithms.setPreferredSize(new Dimension(100,22));
-		algorithms.setMinimumSize(new Dimension(100,22));
+		algorithms.setMaximumSize(new Dimension(120,22));
+		algorithms.setPreferredSize(new Dimension(120,22));
+		algorithms.setMinimumSize(new Dimension(120,22));
 		algorithms.setSelectedIndex(0);
 		JButton btnBwd = new JButton();
 		btnBwd.setIcon(new ImageIcon(this.getClass().getResource("icons/bwd.png")));
 		JButton btnFwd = new JButton();
 		btnFwd.setIcon(new ImageIcon(this.getClass().getResource("icons/fwd.png")));
+		final JToggleButton tglbtnMyGraph = new JToggleButton("My Graph");
 
 		eGrp.add(tglbtnVertex);
 		eGrp.add(tglbtnEdge);
@@ -124,6 +126,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		toolBar.add(algorithms);
 		toolBar.add(btnBwd);
 		toolBar.add(btnFwd);
+		toolBar.add(tglbtnMyGraph);
 		getContentPane().add(toolBar, BorderLayout.NORTH);
 
 		// workspace
@@ -183,10 +186,14 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int fcReturn = fc.showOpenDialog(MainWindow.this);
-				if (fcReturn == JFileChooser.APPROVE_OPTION) {
-					File f = fc.getSelectedFile();
-					gPresenter.setGraph(f);
+				if (!btnDemo.isSelected()) {
+					int fcReturn = fc.showOpenDialog(MainWindow.this);
+					if (fcReturn == JFileChooser.APPROVE_OPTION) {
+						File f = fc.getSelectedFile();
+						gPresenter.setGraph(f);
+					}
+				} else {
+					presenter.populateDialog(Dialogs.MESSAGE, "Can't manipulate graph in demonstration mode.");
 				}
 			}
 
@@ -197,10 +204,14 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int fcReturn = fc.showSaveDialog(MainWindow.this);
-				if(fcReturn == JFileChooser.APPROVE_OPTION) {
-					File f = fc.getSelectedFile();
-					gPresenter.saveGraph(f);
+				if (!btnDemo.isSelected()) {
+					int fcReturn = fc.showSaveDialog(MainWindow.this);
+					if (fcReturn == JFileChooser.APPROVE_OPTION) {
+						File f = fc.getSelectedFile();
+						gPresenter.saveGraph(f);
+					}
+				} else {
+					presenter.populateDialog(Dialogs.MESSAGE, "Can't manipulate graph in demonstration mode.");
 				}
 
 			}
@@ -214,6 +225,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.VERTEX);
 				presenter.stopDemo();
+				tglbtnMyGraph.setSelected(false);
 			}
 
 		});
@@ -225,6 +237,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDGE);
 				presenter.stopDemo();
+				tglbtnMyGraph.setSelected(false);
 			}
 
 		});
@@ -236,6 +249,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.EDIT);
 				presenter.stopDemo();
+				tglbtnMyGraph.setSelected(false);
 			}
 
 		});
@@ -247,6 +261,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 			public void actionPerformed(ActionEvent arg0) {
 				gPresenter.setEditor(GraphPresenter.EditorOptions.REMOVE);
 				presenter.stopDemo();
+				tglbtnMyGraph.setSelected(false);
 			}
 
 		});
@@ -287,7 +302,9 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				presenter.stepBackward();
+				if(!tglbtnMyGraph.isSelected()) {
+					presenter.stepBackward();
+				}
 
 			}
 
@@ -298,7 +315,22 @@ public class MainWindow extends JApplet implements Demonstrator {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				presenter.stepForward();
+				if(!tglbtnMyGraph.isSelected()) {
+					presenter.stepForward();
+				}
+
+			}
+
+		});
+
+		// Show graph that is used in algorithm demonstration
+		tglbtnMyGraph.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (btnDemo.isSelected()) {
+					presenter.showStarterGraph();
+				}
 
 			}
 

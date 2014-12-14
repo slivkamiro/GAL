@@ -51,6 +51,8 @@ public class DemoPresenter extends Presenter implements Observer {
 
 	private Demonstrator demonstrator;
 
+	private boolean starter;
+
 	private GraphAdapter presentGraph;
 	private Stack<GraphAdapter> history;
 
@@ -78,6 +80,7 @@ public class DemoPresenter extends Presenter implements Observer {
 		executor = Executors.newFixedThreadPool(1);
 		algManager = new AlgorithmManager();
 		presentGraph = null;
+		starter = false;
 	}
 
 	/**
@@ -177,6 +180,21 @@ public class DemoPresenter extends Presenter implements Observer {
 	 */
 	public Object[] getAlgorithms() {
 		return algManager.getAlgorithms().toArray();
+	}
+
+	public void showStarterGraph() {
+		// last element is on top of the stack
+		if(!starter) {
+			if(history.empty()) {
+				demonstrator.setGraph(presentGraph);
+			} else {
+				// Demonstration stopped in the middle
+				demonstrator.setGraph(history.firstElement());
+			}
+		} else {
+			demonstrator.setGraph(presentGraph);
+		}
+		starter = !starter;
 	}
 
 }
