@@ -29,7 +29,7 @@ public class ChuLiuEdmonds extends Algorithm {
 	private Branching branching;
 
 	private Vertex root;
-	private Graph workingGraph;
+	protected Graph workingGraph;
 	private Vertex cycleVertex;
 
 	private Set<Vertex> vertices;	 // V
@@ -538,9 +538,9 @@ public class ChuLiuEdmonds extends Algorithm {
 				Object weight = null;
 				Vertex ov = null;
 
+				System.out.println("Reconstruction (ui,x) : " + this.edgeToString(e));
 				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
-					System.out.println("Reconstruction (ui,x) : " + this.edgeToString(ee));
 					Object tmpInId = ee.getVertex(Direction.IN).getId();
 					ov = ee.getVertex(Direction.OUT);
 					if (this.cycleVertices.contains(ov) && tmpInId.equals(inId) && ee.getProperty("bucket") != null){

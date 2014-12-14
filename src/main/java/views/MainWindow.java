@@ -97,7 +97,7 @@ public class MainWindow extends JApplet implements Demonstrator {
 		JToggleButton tglbtnEdit = new JToggleButton("Edit");
 		JToggleButton tglbtnRemove = new JToggleButton("Remove");
 		JButton btnClear = new JButton("Clear");
-		JToggleButton btnDemo = new JToggleButton("Demo");
+		final JToggleButton btnDemo = new JToggleButton("Demo");
 		algorithms = new JComboBox<Object>(presenter.getAlgorithms());
 		algorithms.setMaximumSize(new Dimension(100,22));
 		algorithms.setPreferredSize(new Dimension(100,22));
