@@ -10,9 +10,5 @@ else
     tar -xf apache-maven-3.2.3-bin.tar.gz
 fi
 
-./apache-maven-3.2.3/bin/mvn clean process-resources install
+./apache-maven-3.2.3/bin/mvn clean process-resources package
 
-if [ $1 == "with-dependencies" ]; then
-    export _JAVA_OPTIONS="-Xms256m -Xmx512m"
-    ./apache-maven-3.2.3/bin/mvn assembly:assembly
-fi
