@@ -132,7 +132,9 @@ public class ChuLiuEdmonds extends Algorithm {
 				maxWeight = w;
 			}
 		}
-		this.weightOffset = maxWeight+1;
+		
+		//this.weightOffset = maxWeight+1;
+		this.weightOffset = maxWeight*10;
 		
 		// modify values of all edges
 		for (Edge e : this.workingGraph.getEdges()){
