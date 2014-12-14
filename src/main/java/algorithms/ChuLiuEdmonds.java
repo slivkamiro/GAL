@@ -517,15 +517,36 @@ public class ChuLiuEdmonds extends Algorithm {
 				// (x,ui) - edge incident to cycle
 				Object weight = null;
 				Vertex iv = null;
+				Vertex tmpiv = null;
 
 				// find equivalent edge in Gi-1
 				for (Edge ee : this.workingGraph.getEdges()){
 					Object tmpOutId = ee.getVertex(Direction.OUT).getId();
-					iv = ee.getVertex(Direction.IN);
-					if (this.cycleVertices.contains(iv) && tmpOutId.equals(outId)){
-						weight = ee.getProperty("weight");
-						cycleIncidentEdge = ee;
-						break;
+					tmpiv = ee.getVertex(Direction.IN);
+					if (this.cycleVertices.contains(tmpiv) && tmpOutId.equals(outId)){
+						Object tmpw = ee.getProperty("weight");
+						Integer oldw = 0;
+						Integer neww = 0;
+						if (weight == null) {
+							weight = tmpw;
+							oldw = Integer.parseInt((String)weight);
+							iv = tmpiv;
+							cycleIncidentEdge = ee;
+						}
+						else{
+							oldw = Integer.parseInt((String)weight);
+							neww = Integer.parseInt((String)tmpw);
+							if (this.branching == Branching.MIN){
+								weight = (oldw > neww) ? tmpw : weight;
+							}
+							else {
+								weight = (oldw < neww) ? tmpw : weight;
+							}
+						}
+						if (weight != null && oldw != Integer.parseInt((String)weight)){
+							iv = tmpiv;
+							cycleIncidentEdge = ee;
+						}
 					}
 				}
 
@@ -545,12 +566,16 @@ public class ChuLiuEdmonds extends Algorithm {
 					tmpov = ee.getVertex(Direction.OUT);
 					if (this.cycleVertices.contains(tmpov) && tmpInId.equals(inId)){
 						Object tmpw = ee.getProperty("weight");
+						Integer oldw = 0;
+						Integer neww = 0;
 						if (weight == null) {
 							weight = tmpw;
+							oldw = Integer.parseInt((String)weight);
+							ov = tmpov;
 						}
 						else{
-							Integer oldw = Integer.parseInt((String)weight);
-							Integer neww = Integer.parseInt((String)tmpw);
+							oldw = Integer.parseInt((String)weight);
+							neww = Integer.parseInt((String)tmpw);
 							if (this.branching == Branching.MIN){
 								weight = (oldw > neww) ? tmpw : weight;
 							}
@@ -558,7 +583,9 @@ public class ChuLiuEdmonds extends Algorithm {
 								weight = (oldw < neww) ? tmpw : weight;
 							}
 						}
-						ov = tmpov;
+						if (weight != null && oldw != Integer.parseInt((String)weight)){
+							ov = tmpov;
+						}
 					}
 				}
 
