@@ -14,6 +14,11 @@ import views.CanvasObject;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 
+/**
+ *
+ * @author Miroslav
+ * This class serves as adapter to real model.
+ */
 public class EdgeAdapter extends CanvasObject {
 
 	private Edge e;
@@ -21,27 +26,51 @@ public class EdgeAdapter extends CanvasObject {
 	private Point a;
 	private Point b;
 
+	/**
+	 * Creates new edge based on models edge.
+	 * @param e Models edge.
+	 */
 	public EdgeAdapter(Edge e) {
 		super();
 		this.e = e;
 	}
 
+	/**
+	 * Gets models edge.
+	 * @return edge from model.
+	 */
 	public Edge getEdge() {
 		return e;
 	}
 
+	/**
+	 * Gets vertex from which this edge originates.
+	 * @return vertex adapter class.
+	 */
 	public VertexAdapter getOutVertex() {
 		return new VertexAdapter(e.getVertex(Direction.OUT));
 	}
 
+	/**
+	 * Gets vertex that this edge directs to.
+	 * @return vertex adapter class.
+	 */
 	public VertexAdapter getInVertex() {
 		return new VertexAdapter(e.getVertex(Direction.IN));
 	}
 
+	/**
+	 * Gets weight property of the edge.
+	 * @return string value of weight.
+	 */
 	public String getWeight() {
 		return e.getProperty("weight").toString();
 	}
 
+	/**
+	 * Sets weight property.
+	 * @param w String value of weight. Have to be number.
+	 */
 	public void setWeight(String w) {
 		e.setProperty("weight", w);
 		this.setLabel(w);
@@ -56,6 +85,11 @@ public class EdgeAdapter extends CanvasObject {
 
 	}
 
+	/**
+	 * Sets starting point and end point properties in the edge.
+	 * @param p1 start point.
+	 * @param p2 end point.
+	 */
 	public void setPoints(Point p1, Point p2) {
 		a = p1;
 		b = p2;
@@ -65,6 +99,11 @@ public class EdgeAdapter extends CanvasObject {
 		e.setProperty("endY", ""+b.y);
 	}
 
+	/**
+	 * Sets starting point and end point based on origin vertex and destination vertex.
+	 * @param out origin vertex.
+	 * @param in destination vertex.
+	 */
 	public void setPoints(VertexAdapter out, VertexAdapter in) {
 		Point start = new Point(Integer.parseInt(out.getAttribute("PositionX")),
 				Integer.parseInt(out.getAttribute("PositionY")));
