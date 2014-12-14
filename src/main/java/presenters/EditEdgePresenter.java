@@ -17,14 +17,16 @@ public class EditEdgePresenter extends Presenter {
 	public interface EdgeEditor {
 
 		/**
-		 * Publish edge properties.
+		 * Publish edge properties. Weight to be specific.
 		 * @param e edge to be published.
 		 */
-		public void showEdgeProp(EdgeAdapter e);
+		public void showEdgeProp(Integer w);
 	}
 
 	private EdgeEditor editor;
 	private EdgeAdapter edge;
+
+	private Integer weight;
 
 	/**
 	 * Sets view to this presenter.
@@ -40,13 +42,14 @@ public class EditEdgePresenter extends Presenter {
 	 */
 	public void setEdge(EdgeAdapter e) {
 		edge = e;
+		weight = Integer.parseInt(edge.getWeight());
 	}
 
 	/**
 	 * Display edges properties.
 	 */
 	public void show() {
-		editor.showEdgeProp(edge);
+		editor.showEdgeProp(weight);
 	}
 
 	/**
@@ -56,6 +59,10 @@ public class EditEdgePresenter extends Presenter {
 	public void setWeight(String w) {
 		edge.setWeight(w);
 
+	}
+
+	public void resetWeight() {
+		edge.setWeight(weight.toString());
 	}
 
 

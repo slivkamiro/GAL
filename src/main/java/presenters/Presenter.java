@@ -58,8 +58,8 @@ public abstract class Presenter {
 			p.setView(eeditView);
 			p.setEdge((EdgeAdapter) o);
 			eeditView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-			eeditView.setVisible(true);
 			p.show();
+			eeditView.setVisible(true);
 			break;
 		case MESSAGE:
 			Message m = new Message(o.toString());
