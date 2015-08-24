@@ -1,12 +1,11 @@
-package algorithms;
+package com.slivkam.graphdemonstrator.algorithms;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
-import model.GraphAdapter;
-
+import com.slivkam.graphdemonstrator.model.GraphAdapter;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;

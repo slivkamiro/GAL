@@ -1,6 +1,6 @@
-package presenters;
+package com.slivkam.graphdemonstrator.presenters;
 
-import model.EdgeAdapter;
+import com.slivkam.graphdemonstrator.model.EdgeAdapter;
 
 /**
  *
@@ -36,6 +36,11 @@ public class EditEdgePresenter extends Presenter {
 		editor = e;
 	}
 
+	@Override
+	public View getView() {
+		return (View) this.editor;
+	}
+	
 	/**
 	 * Set edge to be presented.
 	 * @param e

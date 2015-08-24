@@ -1,4 +1,4 @@
-package views;
+package com.slivkam.graphdemonstrator.views;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -11,35 +11,38 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import presenters.GraphPresenter;
-import presenters.GraphPresenter.GraphEditor;
+import com.slivkam.graphdemonstrator.presenters.GraphPresenter.GraphEditor;
 
 /**
  *
  * @author Miroslav
  * Specifies panel in which can be painted some canvas object.
  */
-public class Canvas extends JPanel implements MouseListener, MouseMotionListener, GraphEditor {
+public class Canvas extends JPanel implements MouseListener, MouseMotionListener {
 
 	private List<CanvasObject> objects;
 
-	GraphPresenter presenter;
-	/**
-	 *
-	 */
+	private GraphEditor editor; 
+	
+	//GraphPresenter presenter;
 
 	/**
 	 * Constructor.
 	 * @param presenter that manages this view.
 	 */
-	public Canvas(GraphPresenter presenter) {
+	public Canvas(GraphEditor editor) {
 		super();
-		this.presenter = presenter;
+		this.editor = editor;
+		//this.presenter = pFactory.create(this);
 		objects = new ArrayList<CanvasObject>();
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 	}
 
+//	public GraphPresenter getPresenter() {
+//		return this.presenter;
+//	}
+	
 	private static final long serialVersionUID = 4259767900446651940L;
 
 	@Override
@@ -61,19 +64,19 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	@Override
 	public void mousePressed(MouseEvent me) {
-		presenter.startPoint(me.getPoint());
+		this.editor.canvasMousePressed(me.getPoint());
 
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent me) {
-		presenter.endPoint(me.getPoint());
+		this.editor.canvasMouseReleased(me.getPoint());
 
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent me) {
-		presenter.possibleEndPoint(me.getPoint());
+		this.editor.canvasMouseDragged(me.getPoint());
 
 	}
 
@@ -99,7 +102,6 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	}
 
-	@Override
 	public void drawObject(CanvasObject o) {
 		o.initShape();
 		objects.add(o);
@@ -111,14 +113,12 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	//}
 
-	@Override
 	public void removeLast() {
 		objects.remove(objects.size()-1);
 
 		this.repaint();
 	}
 
-	@Override
 	public void editObject(CanvasObject n) {
 		for (CanvasObject o : objects) {
 			if (o.equals(n)) {
@@ -133,7 +133,6 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	}
 
-	@Override
 	public void removeObjectCloseTo(Point p) {
 		// TODO: when object is vertex I need to remove edges too
 		for (CanvasObject o : objects) {
@@ -146,18 +145,15 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 
 	}
 
-	@Override
 	public void moveVertex(Point x) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public List<CanvasObject> getObjects() {
 		return objects;
 	}
 
-	@Override
 	public void setObjects(List<CanvasObject> objects) {
 		this.objects = objects;
 		for (CanvasObject o : this.objects) {
@@ -168,7 +164,6 @@ public class Canvas extends JPanel implements MouseListener, MouseMotionListener
 	}
 
 
-	@Override
 	public void clean() {
 		objects = new ArrayList<CanvasObject>();
 		repaint();

@@ -1,4 +1,4 @@
-package presenters;
+package com.slivkam.graphdemonstrator.presenters;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
@@ -7,9 +7,12 @@ import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import model.GraphAdapter;
-import algorithms.Algorithm;
-import algorithms.AlgorithmManager;
+import javax.inject.Inject;
+
+import com.slivkam.graphdemonstrator.algorithms.Algorithm;
+import com.slivkam.graphdemonstrator.algorithms.AlgorithmManager;
+import com.slivkam.graphdemonstrator.model.GraphAdapter;
+import com.slivkam.graphdemonstrator.views.GraphDemonstratorView;
 
 /**
  *
@@ -24,6 +27,8 @@ public class DemoPresenter extends Presenter implements Observer {
 	 * Interface that every view that this presenter manage must implement.
 	 */
 	public interface Demonstrator {
+
+		PresenterFactory getPresenterFactory();
 
 		/**
 		 * Publish events.
@@ -72,6 +77,7 @@ public class DemoPresenter extends Presenter implements Observer {
 	 * Constructor.
 	 * @param d View that this presenter manages.
 	 */
+	@Inject
 	public DemoPresenter(Demonstrator d) {
 		super();
 		demonstrator = d;
@@ -81,6 +87,11 @@ public class DemoPresenter extends Presenter implements Observer {
 		algManager = new AlgorithmManager();
 		presentGraph = null;
 		starter = false;
+	}
+	
+	@Override
+	public View getView() {
+		return (View) this.demonstrator;
 	}
 
 	/**

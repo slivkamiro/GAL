@@ -1,4 +1,4 @@
-package algorithms;
+package com.slivkam.graphdemonstrator.algorithms;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

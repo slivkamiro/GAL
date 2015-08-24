@@ -1,4 +1,4 @@
-package presenters;
+package com.slivkam.graphdemonstrator.presenters;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -13,10 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import model.EdgeAdapter;
-import model.GraphAdapter;
-import model.VertexAdapter;
-import views.CanvasObject;
+import javax.inject.Inject;
+
+import com.slivkam.graphdemonstrator.model.EdgeAdapter;
+import com.slivkam.graphdemonstrator.model.GraphAdapter;
+import com.slivkam.graphdemonstrator.model.VertexAdapter;
+import com.slivkam.graphdemonstrator.views.CanvasObject;
 
 /**
  *
@@ -24,7 +26,7 @@ import views.CanvasObject;
  *
  */
 public class GraphPresenter extends Presenter {
-
+	
 	/**
 	 *
 	 * @author Miroslav
@@ -32,11 +34,21 @@ public class GraphPresenter extends Presenter {
 	 */
 	public interface GraphEditor {
 
+		PresenterFactory getPresenterFactory();
+		
+		/**
+		 * Canvas to presenter connectors.
+		 * @param point
+		 */
+		void canvasMousePressed(Point point);
+		void canvasMouseReleased(Point point);
+		void canvasMouseDragged(Point point);
+		
 		/**
 		 * Draw canvas object specified.
 		 * @param o
 		 */
-		public void drawObject(CanvasObject o);
+		void drawObject(CanvasObject o);
 		//public void drawShape(final Shape s);
 		//public void drawDirectedEdge(Point p1, Point p2);
 
@@ -44,18 +56,18 @@ public class GraphPresenter extends Presenter {
 		 * Edit canvas object specified.
 		 * @param o
 		 */
-		public void editObject(CanvasObject o);
+		void editObject(CanvasObject o);
 
 		/**
 		 * Remove object painted to graph on position specified.
 		 * @param p position
 		 */
-		public void removeObjectCloseTo(Point p);
+		void removeObjectCloseTo(Point p);
 
 		/**
 		 * Remove last object painted.
 		 */
-		public void removeLast();
+		void removeLast();
 		//public void removeVertexCloseTo(Point p);
 		//public void removeEdgeCloseTo(Point p);
 
@@ -63,24 +75,24 @@ public class GraphPresenter extends Presenter {
 		 * Move with vertex on position.
 		 * @param p position.
 		 */
-		public void moveVertex(Point p);
+		void moveVertex(Point p);
 
 		/**
 		 * Gets all object from canvas.
 		 * @return list of canvas objects.
 		 */
-		public List<CanvasObject> getObjects();
+		List<CanvasObject> getObjects();
 
 		/**
 		 * Set objects to be painted.
 		 * @param objects list of canvas objects.
 		 */
-		public void setObjects(List<CanvasObject> objects);
+		void setObjects(List<CanvasObject> objects);
 
 		/**
 		 * Clean canvas.
 		 */
-		public void clean();
+		void clean();
 	}
 
 	/**
@@ -108,9 +120,15 @@ public class GraphPresenter extends Presenter {
 	/**
 	 * Default constructor. Present empty graph.
 	 */
-	public GraphPresenter() {
+	private GraphPresenter() {
 		super();
 		graph = new GraphAdapter();
+	}
+	
+	@Inject
+	public GraphPresenter(GraphEditor view) {
+		this();
+		this.editor = view;
 	}
 
 	/**
@@ -119,6 +137,11 @@ public class GraphPresenter extends Presenter {
 	 */
 	public void setView(GraphEditor editor) {
 		this.editor = editor;
+	}
+	
+	@Override
+	public View getView() {
+		return (View) this.editor;
 	}
 
 	/**
@@ -173,13 +196,13 @@ public class GraphPresenter extends Presenter {
 		case EDIT:
 			v = getVertexOnPosition(point);
 			if (v != null) {
-				this.populateDialog(Presenter.Dialogs.EDIT_VERTEX,v);
+				this.populateDialog(v, this.editor.getPresenterFactory().createVertexPresenter());
 				editor.editObject(v);
 				break;
 			}
 			e = getEdgeCloseTo(point);
 			if (e != null) {
-				this.populateDialog(Presenter.Dialogs.EDIT_EDGE, e);
+				this.populateDialog(e, this.editor.getPresenterFactory().createEdgePresenter());
 				editor.editObject(e);
 			}
 			break;
@@ -191,7 +214,7 @@ public class GraphPresenter extends Presenter {
 				break;
 			} else if (v != null && v.getEdges().size() != 0) {
 				// For simplicity user have to remove edges first
-				this.populateDialog(Presenter.Dialogs.MESSAGE, "First remove edges!");
+				this.populateDialog("First remove edges!", null);
 				break;
 			}
 			e = getEdgeCloseTo(point);

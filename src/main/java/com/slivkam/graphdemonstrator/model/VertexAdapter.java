@@ -1,4 +1,4 @@
-package model;
+package com.slivkam.graphdemonstrator.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import views.CanvasObject;
-
+import com.slivkam.graphdemonstrator.views.CanvasObject;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;

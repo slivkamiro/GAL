@@ -1,9 +1,8 @@
-package algorithms;
+package com.slivkam.graphdemonstrator.algorithms;
 
 import java.util.Iterator;
 
-import model.GraphAdapter;
-
+import com.slivkam.graphdemonstrator.model.GraphAdapter;
 import com.tinkerpop.blueprints.Edge;
 
 public class ChuLiuEdmondsMax extends ChuLiuEdmonds {

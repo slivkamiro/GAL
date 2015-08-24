@@ -1,4 +1,4 @@
-package views;
+package com.slivkam.graphdemonstrator.views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -11,7 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-public class Message extends JDialog {
+import com.slivkam.graphdemonstrator.presenters.Presenter.View;
+
+public class Message extends JDialog implements View {
 
 	private final JPanel contentPanel = new JPanel();
 	private JLabel lblMessage;

@@ -1,4 +1,4 @@
-package views;
+package com.slivkam.graphdemonstrator.views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -16,10 +16,11 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import presenters.EditEdgePresenter;
-import presenters.EditEdgePresenter.EdgeEditor;
+import com.slivkam.graphdemonstrator.presenters.EditEdgePresenter;
+import com.slivkam.graphdemonstrator.presenters.EditEdgePresenter.EdgeEditor;
+import com.slivkam.graphdemonstrator.presenters.Presenter.View;
 
-public class EditEdge extends JDialog implements EdgeEditor {
+public class EditEdge extends JDialog implements EdgeEditor, View {
 
 	private final JPanel contentPanel = new JPanel();
 	private JSpinner spWeight;

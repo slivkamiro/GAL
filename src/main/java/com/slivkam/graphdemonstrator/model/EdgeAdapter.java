@@ -1,4 +1,4 @@
-package model;
+package com.slivkam.graphdemonstrator.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,8 +9,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 
-import views.CanvasObject;
-
+import com.slivkam.graphdemonstrator.views.CanvasObject;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 

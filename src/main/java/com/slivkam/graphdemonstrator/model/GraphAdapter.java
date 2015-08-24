@@ -1,4 +1,4 @@
-package model;
+package com.slivkam.graphdemonstrator.model;
 
 import java.awt.Point;
 import java.io.BufferedInputStream;
@@ -9,8 +9,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import views.CanvasObject;
-
+import com.slivkam.graphdemonstrator.views.CanvasObject;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;

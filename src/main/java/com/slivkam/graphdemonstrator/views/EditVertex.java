@@ -1,4 +1,4 @@
-package views;
+package com.slivkam.graphdemonstrator.views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -18,11 +18,12 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
-import model.VertexAdapter;
-import presenters.EditVertexPresenter;
-import presenters.EditVertexPresenter.VertexEditor;
+import com.slivkam.graphdemonstrator.model.VertexAdapter;
+import com.slivkam.graphdemonstrator.presenters.EditVertexPresenter;
+import com.slivkam.graphdemonstrator.presenters.EditVertexPresenter.VertexEditor;
+import com.slivkam.graphdemonstrator.presenters.Presenter.View;
 
-public class EditVertex extends JDialog implements VertexEditor {
+public class EditVertex extends JDialog implements VertexEditor, View {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtfldID;

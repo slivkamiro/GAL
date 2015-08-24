@@ -1,11 +1,11 @@
-package presenters;
+package com.slivkam.graphdemonstrator.presenters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.VertexAdapter;
+import com.slivkam.graphdemonstrator.model.VertexAdapter;
 
 /**
  *
@@ -63,6 +63,11 @@ public class EditVertexPresenter extends Presenter {
 		editor = view;
 	}
 
+	@Override
+	public View getView() {
+		return (View) this.editor;
+	}
+	
 	/**
 	 * Set vertex to be presented.
 	 * @param o Vertex to be presented.

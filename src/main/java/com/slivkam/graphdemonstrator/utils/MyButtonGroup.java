@@ -1,4 +1,4 @@
-package utils;
+package com.slivkam.graphdemonstrator.utils;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;

@@ -1,4 +1,4 @@
-package algorithms;
+package com.slivkam.graphdemonstrator.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
-import model.GraphAdapter;
-
+import com.slivkam.graphdemonstrator.model.GraphAdapter;
 import com.tinkerpop.blueprints.Graph;
 
 /**
