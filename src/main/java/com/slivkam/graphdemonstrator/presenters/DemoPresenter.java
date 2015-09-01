@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import com.slivkam.graphdemonstrator.algorithms.Algorithm;
 import com.slivkam.graphdemonstrator.algorithms.AlgorithmManager;
 import com.slivkam.graphdemonstrator.model.GraphAdapter;
-import com.slivkam.graphdemonstrator.views.GraphDemonstratorView;
 
 /**
  *
@@ -21,191 +20,191 @@ import com.slivkam.graphdemonstrator.views.GraphDemonstratorView;
  */
 public class DemoPresenter extends Presenter implements Observer {
 
-	/**
-	 *
-	 * @author Miroslav
-	 * Interface that every view that this presenter manage must implement.
-	 */
-	public interface Demonstrator {
+    /**
+     *
+     * @author Miroslav
+     * Interface that every view that this presenter manage must implement.
+     */
+    public interface Demonstrator {
 
-		PresenterFactory getPresenterFactory();
+        PresenterFactory getPresenterFactory();
 
-		/**
-		 * Publish events.
-		 * @param ev
-		 */
-		public void addEvent(String ev);
+        /**
+         * Publish events.
+         * @param ev
+         */
+        public void addEvent(String ev);
 
-		/**
-		 * Clear published events.
-		 */
-		public void clearEvents();
+        /**
+         * Clear published events.
+         */
+        public void clearEvents();
 
-		/**
-		 * Publish graph.
-		 * @param graph
-		 */
-		public void setGraph(GraphAdapter graph);
+        /**
+         * Publish graph.
+         * @param graph
+         */
+        public void setGraph(GraphAdapter graph);
 
-		/**
-		 * Gets algorithm to be demonstrated.
-		 * @return
-		 */
-		public String getSelectedAlgorithm();
-	}
+        /**
+         * Gets algorithm to be demonstrated.
+         * @return
+         */
+        public String getSelectedAlgorithm();
+    }
 
-	private Demonstrator demonstrator;
+    private Demonstrator demonstrator;
 
-	private boolean starter;
+    private boolean starter;
 
-	private GraphAdapter presentGraph;
-	private Stack<GraphAdapter> history;
+    private GraphAdapter presentGraph;
+    private Stack<GraphAdapter> history;
 
-	/**
-	 * When going back to history, graphs are pushed here.
-	 * Then if there is attempt to step forward, instead of
-	 * calling algorithm, graph is poped from here.
-	 */
-	private Stack<GraphAdapter> future;
+    /**
+     * When going back to history, graphs are pushed here.
+     * Then if there is attempt to step forward, instead of
+     * calling algorithm, graph is poped from here.
+     */
+    private Stack<GraphAdapter> future;
 
-	private ExecutorService executor;
+    private ExecutorService executor;
 
-	private AlgorithmManager algManager;
-	private Algorithm alg = null;
+    private AlgorithmManager algManager;
+    private Algorithm alg = null;
 
-	/**
-	 * Constructor.
-	 * @param d View that this presenter manages.
-	 */
-	@Inject
-	public DemoPresenter(Demonstrator d) {
-		super();
-		demonstrator = d;
-		history = new Stack<GraphAdapter>();
-		future = new Stack<GraphAdapter>();
-		executor = Executors.newFixedThreadPool(1);
-		algManager = new AlgorithmManager();
-		presentGraph = null;
-		starter = false;
-	}
-	
-	@Override
-	public View getView() {
-		return (View) this.demonstrator;
-	}
+    /**
+     * Constructor.
+     * @param d View that this presenter manages.
+     */
+    @Inject
+    public DemoPresenter(Demonstrator d) {
+        super();
+        this.demonstrator = d;
+        this.history = new Stack<GraphAdapter>();
+        this.future = new Stack<GraphAdapter>();
+        this.executor = Executors.newFixedThreadPool(1);
+        this.algManager = new AlgorithmManager();
+        this.presentGraph = null;
+        this.starter = false;
+    }
 
-	/**
-	 * Initialize algorithm to be demonstrated.
-	 * @param graph Graph that algorithm should be demonstrated on.
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	public void start(GraphAdapter graph) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		// Called on demo button selected/deselected
-		if(alg == null) {
-			alg = algManager.getAlgorithm(demonstrator.getSelectedAlgorithm());
-			alg.addObserver(this);
-			presentGraph = graph;
-			//history.push(graph);
-			alg.setGraph(graph);
-		} else {
-			stopDemo();
-		}
+    @Override
+    public View getView() {
+        return (View) this.demonstrator;
+    }
 
-	}
+    /**
+     * Initialize algorithm to be demonstrated.
+     * @param graph Graph that algorithm should be demonstrated on.
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     */
+    public void start(GraphAdapter graph) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        // Called on demo button selected/deselected
+        if(this.alg == null) {
+            this.alg = this.algManager.getAlgorithm(this.demonstrator.getSelectedAlgorithm());
+            this.alg.addObserver(this);
+            this.presentGraph = graph;
+            //history.push(graph);
+            this.alg.setGraph(graph);
+        } else {
+            this.stopDemo();
+        }
 
-	/**
-	 * Stops demonstration.
-	 */
-	public void stopDemo() {
-		if(alg != null) {
-			alg.deleteObserver(this);
-			alg = null;
-			demonstrator.clearEvents();
-			// last element is on top of the stack
-			if(history.empty()) {
-				demonstrator.setGraph(presentGraph);
-			} else {
-				// Demonstration stopped in the middle
-				demonstrator.setGraph(history.firstElement());
-			}
-			presentGraph = null;
-			history.clear();
-			future.clear();
-		}
+    }
 
-	}
+    /**
+     * Stops demonstration.
+     */
+    public void stopDemo() {
+        if(this.alg != null) {
+            this.alg.deleteObserver(this);
+            this.alg = null;
+            this.demonstrator.clearEvents();
+            // last element is on top of the stack
+            if(this.history.empty()) {
+                this.demonstrator.setGraph(this.presentGraph);
+            } else {
+                // Demonstration stopped in the middle
+                this.demonstrator.setGraph(this.history.firstElement());
+            }
+            this.presentGraph = null;
+            this.history.clear();
+            this.future.clear();
+        }
 
-	/**
-	 * Do one step of algorithm.
-	 */
-	public void stepForward() {
-		if (alg != null) {
-			if (!future.empty()) {
-				history.push(presentGraph);
-				presentGraph = future.pop();
-				demonstrator.setGraph(presentGraph);
-			}
-			else {
-				executor.execute(alg);
-			}
-		}
-	}
+    }
 
-	/**
-	 * Do one step back in algorithm.
-	 */
-	public void stepBackward() {
-		if (!history.empty()) {
-			future.push(presentGraph);
-			presentGraph = history.pop();
-			demonstrator.setGraph(presentGraph);
-		}
-	}
+    /**
+     * Do one step of algorithm.
+     */
+    public void stepForward() {
+        if (this.alg != null) {
+            if (!this.future.empty()) {
+                this.history.push(this.presentGraph);
+                this.presentGraph = this.future.pop();
+                this.demonstrator.setGraph(this.presentGraph);
+            }
+            else {
+                this.executor.execute(this.alg);
+            }
+        }
+    }
 
-	@Override
-	public void update(Observable alg, Object o) {
-		if (alg.equals(this.alg)) {
-			history.push(presentGraph);
-			presentGraph = this.alg.getGraph();
-			//history.push(this.alg.getGraph());
-			demonstrator.setGraph(presentGraph);
-			StringBuilder event = new StringBuilder();
-			for(String key : this.alg.getPropertiesName()) {
-				event.append(key+": ");
-				event.append(this.alg.getProperty(key)+"\n");
-			}
-			this.alg.clearProperties();
-			demonstrator.addEvent(event.toString());
-		}
+    /**
+     * Do one step back in algorithm.
+     */
+    public void stepBackward() {
+        if (!this.history.empty()) {
+            this.future.push(this.presentGraph);
+            this.presentGraph = this.history.pop();
+            this.demonstrator.setGraph(this.presentGraph);
+        }
+    }
 
-	}
+    @Override
+    public void update(Observable alg, Object o) {
+        if (alg.equals(this.alg)) {
+            this.history.push(this.presentGraph);
+            this.presentGraph = this.alg.getGraph();
+            //history.push(this.alg.getGraph());
+            this.demonstrator.setGraph(this.presentGraph);
+            StringBuilder event = new StringBuilder();
+            for(String key : this.alg.getPropertiesName()) {
+                event.append(key+": ");
+                event.append(this.alg.getProperty(key)+"\n");
+            }
+            this.alg.clearProperties();
+            this.demonstrator.addEvent(event.toString());
+        }
 
-	/**
-	 * Gets all known algorithms.
-	 * @return Array of objects that holds names of algorithms.
-	 */
-	public Object[] getAlgorithms() {
-		return algManager.getAlgorithms().toArray();
-	}
+    }
 
-	public void showStarterGraph() {
-		// last element is on top of the stack
-		if(!starter) {
-			if(history.empty()) {
-				demonstrator.setGraph(presentGraph);
-			} else {
-				// Demonstration stopped in the middle
-				demonstrator.setGraph(history.firstElement());
-			}
-		} else {
-			demonstrator.setGraph(presentGraph);
-		}
-		starter = !starter;
-	}
+    /**
+     * Gets all known algorithms.
+     * @return Array of objects that holds names of algorithms.
+     */
+    public Object[] getAlgorithms() {
+        return this.algManager.getAlgorithms().toArray();
+    }
+
+    public void showStarterGraph() {
+        // last element is on top of the stack
+        if(!this.starter) {
+            if(this.history.empty()) {
+                this.demonstrator.setGraph(this.presentGraph);
+            } else {
+                // Demonstration stopped in the middle
+                this.demonstrator.setGraph(this.history.firstElement());
+            }
+        } else {
+            this.demonstrator.setGraph(this.presentGraph);
+        }
+        this.starter = !this.starter;
+    }
 
 }
