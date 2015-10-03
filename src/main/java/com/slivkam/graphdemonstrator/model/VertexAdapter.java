@@ -3,13 +3,12 @@ package com.slivkam.graphdemonstrator.model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.slivkam.graphdemonstrator.views.CanvasObject;
+import com.slivkam.graphdemonstrator.swingcomponents.Circle;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -19,18 +18,30 @@ import com.tinkerpop.blueprints.Vertex;
  * @author Miroslav
  * Serves as adapter to model's vertex.
  */
-public class VertexAdapter extends CanvasObject{
+public class VertexAdapter extends Circle{
 
     private Vertex v;
 
     /**
      * Creates new VertexAdapter that holds model's vertex.
      * @param v model's vertex
+     * @param c center of vertex
      */
-    public VertexAdapter(Vertex v) {
-        super();
+    public VertexAdapter(Vertex v, Point c) {
+        super(c);
         this.v = v;
         this.setLabel(v.getId().toString());
+        v.setProperty("PositionX", String.valueOf(c.x));
+        v.setProperty("PositionY", String.valueOf(c.y));
+    }
+
+    /**
+     * Creates Vertex adapter from vertex that already has defined position.
+     * @param v
+     */
+    public VertexAdapter(Vertex v) {
+        this(v,new Point(Integer.valueOf(v.getProperty("PositionX")),
+                Integer.valueOf(v.getProperty("PositionY"))));
     }
 
     /**
@@ -96,6 +107,7 @@ public class VertexAdapter extends CanvasObject{
         for (Edge e : this.v.getEdges(Direction.BOTH, "1")) {
             EdgeAdapter ea = new EdgeAdapter(e);
             ea.setPoints(ea.getOutVertex(),ea.getInVertex());
+            ea.setLabel(e.getProperty("weight"));
             edges.add(ea);
         }
         return edges;
@@ -112,35 +124,16 @@ public class VertexAdapter extends CanvasObject{
 
     @Override
     public void drawObject(Graphics2D g2) {
+        super.drawObject(g2);
         g2.setColor(Color.BLACK);
         if (this.getShape() != null) {
-            g2.draw(this.getShape());
-            int x = (int) ((Ellipse2D) this.getShape()).getCenterX();
-            int y = (int) ((Ellipse2D) this.getShape()).getCenterY();
+            int x = this.getCenterPoint().x;
+            int y = this.getCenterPoint().y;
             g2.drawString(this.getLabel(),x , y );
 
         }
     }
 
-    @Override
-    public void initShape() {
-        Integer x = Integer.parseInt(this.v.getProperty("PositionX").toString());
-        Integer y = Integer.parseInt(this.v.getProperty("PositionY").toString());
-        Ellipse2D e = new Ellipse2D.Double(x-10.0, y-10.0, 20.0, 20.0);
-        this.setShape(e);
-
-    }
-
-    @Override
-    public boolean contains(Point p) {
-        Ellipse2D vertex = (Ellipse2D) this.getShape();
-        return vertex.contains(p);
-        /*if(Math.pow(p.x-vertex.getCenterX(),2)+
-				Math.pow(p.y-vertex.getCenterY(), 2) < 100) {
-			return true;
-		}
-		return false;*/
-    }
 
     @Override
     public boolean equals(Object o) {

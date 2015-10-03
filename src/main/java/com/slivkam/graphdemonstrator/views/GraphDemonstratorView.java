@@ -32,10 +32,13 @@ import com.slivkam.graphdemonstrator.presenters.GraphPresenter;
 import com.slivkam.graphdemonstrator.presenters.GraphPresenter.GraphEditor;
 import com.slivkam.graphdemonstrator.presenters.Presenter.PresenterFactory;
 import com.slivkam.graphdemonstrator.presenters.Presenter.View;
+import com.slivkam.graphdemonstrator.swingcomponents.Canvas;
+import com.slivkam.graphdemonstrator.swingcomponents.Canvas.CanvasConnector;
+import com.slivkam.graphdemonstrator.swingcomponents.CanvasObject;
 import com.slivkam.graphdemonstrator.utils.MyButtonGroup;
 
 
-public class GraphDemonstratorView implements Demonstrator, GraphEditor, View {
+public class GraphDemonstratorView implements Demonstrator, GraphEditor, CanvasConnector, View {
 
     private DemoPresenter demoPresenter;
 
@@ -123,9 +126,8 @@ public class GraphDemonstratorView implements Demonstrator, GraphEditor, View {
     }
 
     @Override
-    public void moveVertex(Point p) {
-        this.canvas.moveVertex(p);
-
+    public void removeObject(CanvasObject o) {
+        this.canvas.removeObject(o);
     }
 
     @Override

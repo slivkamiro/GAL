@@ -1,4 +1,4 @@
-package com.slivkam.graphdemonstrator.views;
+package com.slivkam.graphdemonstrator.swingcomponents;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

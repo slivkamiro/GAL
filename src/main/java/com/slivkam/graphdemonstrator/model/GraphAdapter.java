@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.slivkam.graphdemonstrator.views.CanvasObject;
+import com.slivkam.graphdemonstrator.swingcomponents.CanvasObject;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -54,8 +54,8 @@ public class GraphAdapter{
      * Adds vertex to model and return created vertex wrapped into VertexAdapter.
      * @return just created vertex wrapped into VertexAdapter.
      */
-    public VertexAdapter addVertex() {
-        return new VertexAdapter(this.graph.addVertex(String.valueOf(this.vId++)));
+    public VertexAdapter addVertex(Point p) {
+        return new VertexAdapter(this.graph.addVertex(String.valueOf(this.vId++)),p);
     }
 
     /**
@@ -63,8 +63,8 @@ public class GraphAdapter{
      * @param id id of new vertex.
      * @return vertex created wrapped into VertexAdapter.
      */
-    public VertexAdapter addVertex(String id) {
-        return new VertexAdapter(this.graph.addVertex(id));
+    public VertexAdapter addVertex(String id, Point p) {
+        return new VertexAdapter(this.graph.addVertex(id),p);
     }
 
     /**
@@ -194,7 +194,7 @@ public class GraphAdapter{
     }
 
     /**
-     * Gets all objects ready in graph ready to be painted.
+     * Gets all objects in graph ready to be painted.
      * TODO should this be here?
      * @return list of canvas objects.
      */
@@ -204,12 +204,13 @@ public class GraphAdapter{
             o.add(v);
         }
         for (EdgeAdapter e : this.getEdges()) {
-            int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
-            int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
-            int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
-            int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
-            e.setPoints(new Point(x1,y1), new Point(x2,y2),
-                    e.getEdge().getVertex(Direction.IN).equals(e.getEdge().getVertex(Direction.OUT)));
+            //            int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
+            //            int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
+            //            int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
+            //            int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
+            //            e.setPoints(new Point(x1,y1), new Point(x2,y2),
+            //                    e.getEdge().getVertex(Direction.IN).equals(e.getEdge().getVertex(Direction.OUT)));
+            e.setPoints(e.getOutVertex(),e.getInVertex());
             e.setLabel(e.getEdge().getProperty("weight").toString());
             o.add(e);
         }
@@ -225,12 +226,7 @@ public class GraphAdapter{
      */
     public void recomputeEdgesCoords() {
         for(EdgeAdapter e : this.getEdges()) {
-            if (e.getEdge().getProperty("startX") == null
-                    || e.getEdge().getProperty("startY") == null
-                    || e.getEdge().getProperty("endX") == null
-                    || e.getEdge().getProperty("startY") == null) {
-                e.setPoints(e.getOutVertex(),e.getInVertex());
-            }
+            e.setPoints(e.getOutVertex(),e.getInVertex());
         }
 
     }

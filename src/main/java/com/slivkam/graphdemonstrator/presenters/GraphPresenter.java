@@ -1,14 +1,8 @@
 package com.slivkam.graphdemonstrator.presenters;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.CubicCurve2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +13,9 @@ import javax.inject.Inject;
 import com.slivkam.graphdemonstrator.model.EdgeAdapter;
 import com.slivkam.graphdemonstrator.model.GraphAdapter;
 import com.slivkam.graphdemonstrator.model.VertexAdapter;
-import com.slivkam.graphdemonstrator.views.CanvasObject;
+import com.slivkam.graphdemonstrator.swingcomponents.CanvasObject;
+import com.slivkam.graphdemonstrator.swingcomponents.Connectable;
+import com.slivkam.graphdemonstrator.swingcomponents.CurvedArrow;
 
 /**
  *
@@ -36,14 +32,6 @@ public class GraphPresenter extends Presenter {
     public interface GraphEditor {
 
         PresenterFactory getPresenterFactory();
-
-        /**
-         * Canvas to presenter connectors.
-         * @param point
-         */
-        void canvasMousePressed(Point point);
-        void canvasMouseReleased(Point point);
-        void canvasMouseDragged(Point point);
 
         /**
          * Draw canvas object specified.
@@ -72,11 +60,7 @@ public class GraphPresenter extends Presenter {
         //public void removeVertexCloseTo(Point p);
         //public void removeEdgeCloseTo(Point p);
 
-        /**
-         * Move with vertex on position.
-         * @param p position.
-         */
-        void moveVertex(Point p);
+        void removeObject(CanvasObject o);
 
         /**
          * Gets all object from canvas.
@@ -159,8 +143,8 @@ public class GraphPresenter extends Presenter {
             // add edge to model and draw it on canvas
             VertexAdapter out = this.getVertexOnPosition(this.start);
             VertexAdapter in = this.getVertexOnPosition(this.end);
-            this.editor.removeLast();
             if (out != null && in != null) {
+                this.editor.removeLast();
                 EdgeAdapter e = this.graph.addEdge(out, in);
                 e.setPoints(out, in);
                 this.editor.drawObject(e);
@@ -172,9 +156,7 @@ public class GraphPresenter extends Presenter {
                 break;
             }
             // add vertex to model
-            VertexAdapter v = this.graph.addVertex();
-            v.setAttribute("PositionX", String.valueOf(point.x));
-            v.setAttribute("PositionY", String.valueOf(point.y));
+            VertexAdapter v = this.graph.addVertex(point);
             // draw vertex to canvas
             this.editor.drawObject(v);
             break;
@@ -197,7 +179,9 @@ public class GraphPresenter extends Presenter {
         case EDGE:
             this.start = point;
             this.end = point;
-            this.editor.drawObject(new IntermediateEdge(this.start,this.end));
+            v = this.getVertexOnPosition(this.start);
+            if (v == null) break;
+            this.editor.drawObject(new CurvedArrow(v,new ConnectablePoint(this.end)));
             //editor.drawShape(new Line2D.Double(start, end));
             break;
         case EDIT:
@@ -237,12 +221,9 @@ public class GraphPresenter extends Presenter {
         case VERTEX:
             // check if there is already vertex at this position
             // if there is one, lets move it
-            // TODO move with nodes
-            //v = this.getVertexOnPosition(point);
-
-            break;
-            //if (v == null) break;
-            //this.movingVertexPosition = point;
+            v = this.getVertexOnPosition(point);
+            if (v == null) break;
+            this.movingVertexPosition = point;
         case NONE:
             break;
         }
@@ -299,7 +280,7 @@ public class GraphPresenter extends Presenter {
             final VertexAdapter out = this.getVertexOnPosition(this.start);
             if (out != null) {
                 this.editor.removeLast();
-                this.editor.drawObject(new IntermediateEdge(EdgeAdapter.getTouchPoint(this.start,this.end,out,this.start),this.end) );
+                this.editor.drawObject(new CurvedArrow(out,new ConnectablePoint(this.end)) );
             }
             break;
         case EDIT:
@@ -308,17 +289,12 @@ public class GraphPresenter extends Presenter {
         case VERTEX:
             if (this.movingVertexPosition == null) break;
             VertexAdapter v = this.getVertexOnPosition(this.movingVertexPosition);
-            this.editor.removeObjectCloseTo(this.movingVertexPosition);
+            this.editor.removeObject(v);
             v.setAttribute("PositionX", String.valueOf(point.x));
             v.setAttribute("PositionY", String.valueOf(point.y));
             this.editor.drawObject(v);
             for (EdgeAdapter e : v.getEdges()) {
-                this.tryRemoveEdge(e);
-                if (e.getInVertex().equals(v)) {
-                    e.setPoints(e.getOutVertex(), v);
-                } else {
-                    e.setPoints(v, e.getInVertex());
-                }
+                this.editor.removeObject(e);
                 this.editor.drawObject(e);
             }
             this.movingVertexPosition = point;
@@ -433,117 +409,42 @@ public class GraphPresenter extends Presenter {
         }
     }
 
-    private class IntermediateEdge extends CanvasObject {
+    /**
+     *
+     * @author Miroslav
+     *
+     */
+    private class ConnectablePoint implements Connectable {
 
-        private Point out;
-        private Point end;
+        private Point center;
 
-        public IntermediateEdge(Point outPoint, Point endPoint) {
-            this.out = outPoint;
-            this.end = endPoint;
+        public ConnectablePoint(Point c) {
+            this.center = c;
         }
 
         @Override
-        public boolean contains(Point p) {
-
-            return false;
+        public Point getTouchPoint(Point start, Point end, Point def) {
+            return this.center;
         }
 
         @Override
-        public void initShape() {
+        public Point getCenterPoint() {
+            return this.center;
+        }
 
-            CubicCurve2D l = new CubicCurve2D.Double();
+        @Override
+        public List<CurvedArrow> getConnections() {
+            return null;
+        }
 
-            double x1 = this.out.getX();
-            double x2 = this.end.getX();
-            double y1 = this.out.getY();
-            double y2 = this.end.getY();
-            int x = (int) (x1 + x2)/2;
-            int y = (int) (y1 + y2)/2;
-
-            Point2D cp1;
-            Point2D cp2;
-
-            // adjust control point coords
-            double cpx1;
-            double cpy1;
-            double cpx2;
-            double cpy2;
-
-            double dx = Math.abs(x2-x1);
-            double dy = Math.abs(y2-y1);
-
-            if (x2 > x1) {
-                cpx1 = x + dy/4 - dx/4;
-                cpx2 = x + dy/4 + dx/4;
-            } else {
-                cpx1 = x - dy/4 + dx/4;
-                cpx2 = x - dy/4 - dx/4;
-            }
-
-            if (y2 > y1) {
-                cpy1 = y - dx/4 - dy/4;
-                cpy2 = y - dx/4 + dy/4;
-            } else {
-                cpy1 = y + dx/4 + dy/4;
-                cpy2 = y + dx/4 - dy/4;
-            }
-
-            cp1 = new Point2D.Double(cpx1, cpy1);
-            cp2 = new Point2D.Double(cpx2, cpy2);
-
-
-            l.setCurve(this.out, cp1, cp2, this.end);
-            this.setShape(l);
+        @Override
+        public void addConnection(CurvedArrow connection) {
 
         }
 
         @Override
-        public void drawObject(Graphics2D g2) {
-            // this is overriden so that arrow is drawn always
-            g2.setColor(Color.BLACK);
-            if (this.getShape() != null) {
-                g2.draw(this.getShape());
-                double x1 = ((CubicCurve2D) this.getShape()).getCtrlX2();
-                double x2 = ((CubicCurve2D) this.getShape()).getX2();
-                double y1 = ((CubicCurve2D) this.getShape()).getCtrlY2();
-                double y2 = ((CubicCurve2D) this.getShape()).getY2();
-                int x = (int) (x1 + x2)/2;
-                int y = (int) (y1 + y2)/2;
+        public void removeConnection(CurvedArrow connection) {
 
-                // length of the line
-                double length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-                // angle with x
-                double angle = Math.atan2(y2-y1, x2-x1);
-
-                // arrow
-                GeneralPath path = new GeneralPath();
-                path.moveTo((float)length, 0);
-                path.lineTo((float)length - 10, -5);
-                path.lineTo((float)length - 7, 0);
-                path.lineTo((float)length - 10, 5);
-                path.lineTo((float)length, 0);
-                path.closePath();
-
-                try {
-                    AffineTransform af = AffineTransform.getTranslateInstance(x1, y1);
-                    af.concatenate(AffineTransform.getRotateInstance(angle));
-                    g2.transform(af);
-
-                    Area area = new Area(path);
-                    g2.fill(area);
-
-                    af.invert();
-                    g2.transform(af);
-                } catch (NoninvertibleTransformException e) {
-                    // TODO: what to do here?
-                    e.printStackTrace();
-                }
-
-                g2.drawString(this.getLabel(),x , y );
-
-            }
         }
     }
-
 }
