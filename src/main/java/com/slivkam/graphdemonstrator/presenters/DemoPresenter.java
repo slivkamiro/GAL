@@ -1,5 +1,6 @@
 package com.slivkam.graphdemonstrator.presenters;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
 import java.util.Observer;
@@ -75,9 +76,11 @@ public class DemoPresenter extends Presenter implements Observer {
     /**
      * Constructor.
      * @param d View that this presenter manages.
+     * @throws IOException
+     * @throws ClassNotFoundException
      */
     @Inject
-    public DemoPresenter(Demonstrator d) {
+    public DemoPresenter(Demonstrator d) throws ClassNotFoundException, IOException {
         super();
         this.demonstrator = d;
         this.history = new Stack<GraphAdapter>();

@@ -20,152 +20,150 @@ import com.slivkam.graphdemonstrator.presenters.GraphPresenter.GraphEditor;
  */
 public class Canvas extends JPanel implements MouseListener, MouseMotionListener {
 
-	private List<CanvasObject> objects;
+    private List<CanvasObject> objects;
 
-	private GraphEditor editor; 
-	
-	//GraphPresenter presenter;
+    private GraphEditor editor;
 
-	/**
-	 * Constructor.
-	 * @param presenter that manages this view.
-	 */
-	public Canvas(GraphEditor editor) {
-		super();
-		this.editor = editor;
-		//this.presenter = pFactory.create(this);
-		objects = new ArrayList<CanvasObject>();
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
-	}
+    //GraphPresenter presenter;
 
-//	public GraphPresenter getPresenter() {
-//		return this.presenter;
-//	}
-	
-	private static final long serialVersionUID = 4259767900446651940L;
+    /**
+     * Constructor.
+     * @param presenter that manages this view.
+     */
+    public Canvas(GraphEditor editor) {
+        super();
+        this.editor = editor;
+        //this.presenter = pFactory.create(this);
+        this.objects = new ArrayList<CanvasObject>();
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
+    }
 
-	@Override
-	public void mouseClicked(MouseEvent me) {
-		// pass
-	}
+    //	public GraphPresenter getPresenter() {
+    //		return this.presenter;
+    //	}
 
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    private static final long serialVersionUID = 4259767900446651940L;
 
-	}
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        // pass
+    }
 
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mousePressed(MouseEvent me) {
-		this.editor.canvasMousePressed(me.getPoint());
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mouseReleased(MouseEvent me) {
-		this.editor.canvasMouseReleased(me.getPoint());
+    @Override
+    public void mousePressed(MouseEvent me) {
+        this.editor.canvasMousePressed(me.getPoint());
 
-	}
+    }
 
-	@Override
-	public void mouseDragged(MouseEvent me) {
-		this.editor.canvasMouseDragged(me.getPoint());
+    @Override
+    public void mouseReleased(MouseEvent me) {
+        this.editor.canvasMouseReleased(me.getPoint());
 
-	}
+    }
 
-	@Override
-	public void mouseMoved(MouseEvent me) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseDragged(MouseEvent me) {
+        this.editor.canvasMouseDragged(me.getPoint());
 
-	}
+    }
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        // TODO Auto-generated method stub
 
-		drawObjects((Graphics2D) g);
+    }
 
-	}
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-	private void drawObjects(Graphics2D g2) {
+        this.drawObjects((Graphics2D) g);
 
-		for (CanvasObject o : objects) {
-			o.drawObject(g2);
-		}
+    }
 
-	}
+    private void drawObjects(Graphics2D g2) {
 
-	public void drawObject(CanvasObject o) {
-		o.initShape();
-		objects.add(o);
-		this.repaint();
-	}
+        for (CanvasObject o : this.objects) {
+            o.drawObject(g2);
+        }
 
-	//public void drawDirectedEdge(Point p1, Point p2) {
-	//drawEdge(p1,p2);
+    }
 
-	//}
+    public void drawObject(CanvasObject o) {
+        o.initShape();
+        this.objects.add(o);
+        this.repaint();
+    }
 
-	public void removeLast() {
-		objects.remove(objects.size()-1);
+    //public void drawDirectedEdge(Point p1, Point p2) {
+    //drawEdge(p1,p2);
 
-		this.repaint();
-	}
+    //}
 
-	public void editObject(CanvasObject n) {
-		for (CanvasObject o : objects) {
-			if (o.equals(n)) {
-				objects.remove(o);
-				// TODO: implement vertex replacing
-				n.setShape(o.getShape());
-				objects.add(n);
-				break;
-			}
-		}
-		repaint();
+    public void removeLast() {
+        this.objects.remove(this.objects.size()-1);
 
-	}
+        this.repaint();
+    }
 
-	public void removeObjectCloseTo(Point p) {
-		// TODO: when object is vertex I need to remove edges too
-		for (CanvasObject o : objects) {
-			if (o.contains(p)) {
-				objects.remove(o);
-				break;
-			}
-		}
-		repaint();
+    public void editObject(CanvasObject n) {
+        for (CanvasObject o : this.objects) {
+            if (o.equals(n)) {
+                this.objects.remove(o);
+                n.setShape(o.getShape());
+                this.objects.add(n);
+                break;
+            }
+        }
+        this.repaint();
 
-	}
+    }
 
-	public void moveVertex(Point x) {
-		// TODO Auto-generated method stub
+    public void removeObjectCloseTo(Point p) {
+        for (CanvasObject o : this.objects) {
+            if (o.contains(p)) {
+                this.objects.remove(o);
+                break;
+            }
+        }
+        this.repaint();
 
-	}
+    }
 
-	public List<CanvasObject> getObjects() {
-		return objects;
-	}
+    public void moveVertex(Point x) {
+        // TODO Auto-generated method stub
 
-	public void setObjects(List<CanvasObject> objects) {
-		this.objects = objects;
-		for (CanvasObject o : this.objects) {
-			o.initShape();
-		}
-		repaint();
+    }
 
-	}
+    public List<CanvasObject> getObjects() {
+        return this.objects;
+    }
+
+    public void setObjects(List<CanvasObject> objects) {
+        this.objects = objects;
+        for (CanvasObject o : this.objects) {
+            o.initShape();
+        }
+        this.repaint();
+
+    }
 
 
-	public void clean() {
-		objects = new ArrayList<CanvasObject>();
-		repaint();
-	}
+    public void clean() {
+        this.objects = new ArrayList<CanvasObject>();
+        this.repaint();
+    }
 }

@@ -26,189 +26,224 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
 public class GraphAdapter{
 
 
-	private Graph graph;
+    private Graph graph;
 
-	private Integer vId;
-	private Integer eId;
+    private Integer vId;
+    private Integer eId;
 
-	/**
-	 * Create whole new graph in model.
-	 */
-	public GraphAdapter() {
-		vId = 1;
-		eId = 1;
-		graph = new TinkerGraph();
-	}
+    /**
+     * Create whole new graph in model.
+     */
+    public GraphAdapter() {
+        this.vId = 1;
+        this.eId = 1;
+        this.graph = new TinkerGraph();
+    }
 
-	/**
-	 * Takes already created graph in model and uses it as initialization.
-	 * @param g model graph.
-	 */
-	public GraphAdapter(Graph g) {
-		graph = g;
-		vId = getMaxVertexId() + 1;
-		eId = getMaxEdgeId() + 1;
-	}
+    /**
+     * Takes already created graph in model and uses it as initialization.
+     * @param g model graph.
+     */
+    public GraphAdapter(Graph g) {
+        this.graph = g;
+        this.vId = this.getMaxVertexId() + 1;
+        this.eId = this.getMaxEdgeId() + 1;
+    }
 
-	/**
-	 * Adds vertex to model and return created vertex wrapped into VertexAdapter.
-	 * @return just created vertex wrapped into VertexAdapter.
-	 */
-	public VertexAdapter addVertex() {
-		return new VertexAdapter(graph.addVertex(String.valueOf(vId++)));
-	}
+    /**
+     * Adds vertex to model and return created vertex wrapped into VertexAdapter.
+     * @return just created vertex wrapped into VertexAdapter.
+     */
+    public VertexAdapter addVertex() {
+        return new VertexAdapter(this.graph.addVertex(String.valueOf(this.vId++)));
+    }
 
-	/**
-	 * Adds vertex with id specified and return created vertex wrapped into VertexAdapter.
-	 * @param id id of new vertex.
-	 * @return vertex created wrapped into VertexAdapter.
-	 */
-	public VertexAdapter addVertex(String id) {
-		return new VertexAdapter(graph.addVertex(id));
-	}
+    /**
+     * Adds vertex with id specified and return created vertex wrapped into VertexAdapter.
+     * @param id id of new vertex.
+     * @return vertex created wrapped into VertexAdapter.
+     */
+    public VertexAdapter addVertex(String id) {
+        return new VertexAdapter(this.graph.addVertex(id));
+    }
 
-	/**
-	 * Adds new edge to model based on origin and destination vertices.
-	 * @param out origin vertex wrapped in VertexAdapter.
-	 * @param in destination vertex wrapped in VertexAdapter.
-	 * @return new edge wrapped in EdgeAdapter.
-	 */
-	public EdgeAdapter addEdge(VertexAdapter out, VertexAdapter in) {
-		EdgeAdapter e = new EdgeAdapter(
-				graph.addEdge(String.valueOf(eId++), out.getVertex(), in.getVertex(), "1"));
-		e.setWeight("1");
-		return e;
-	}
+    /**
+     * Adds new edge to model based on origin and destination vertices.
+     * @param out origin vertex wrapped in VertexAdapter.
+     * @param in destination vertex wrapped in VertexAdapter.
+     * @return new edge wrapped in EdgeAdapter.
+     */
+    public EdgeAdapter addEdge(VertexAdapter out, VertexAdapter in) {
+        EdgeAdapter e = new EdgeAdapter(
+                this.graph.addEdge(String.valueOf(this.eId++), out.getVertex(), in.getVertex(), "1"));
+        e.setWeight("1");
+        return e;
+    }
 
-	/**
-	 * Gets all vertices in model.
-	 * @return list of vertices wrapped in VertexAdapter.
-	 */
-	public List<VertexAdapter> getVertices() {
-		List<VertexAdapter> vertices = new ArrayList<VertexAdapter>();
-		for (Vertex v : graph.getVertices()) {
-			vertices.add(new VertexAdapter(v));
-		}
-		return vertices;
-	}
+    /**
+     * Gets all vertices in model.
+     * @return list of vertices wrapped in VertexAdapter.
+     */
+    public List<VertexAdapter> getVertices() {
+        List<VertexAdapter> vertices = new ArrayList<VertexAdapter>();
+        for (Vertex v : this.graph.getVertices()) {
+            vertices.add(new VertexAdapter(v));
+        }
+        return vertices;
+    }
 
-	/**
-	 * Removes vertex from a model.
-	 * @param v vertex to be removed wrapped in VertexAdapter.
-	 */
-	public void removeVertex(VertexAdapter v) {
-		graph.removeVertex(v.getVertex());
+    /**
+     * Removes vertex from a model.
+     * @param v vertex to be removed wrapped in VertexAdapter.
+     */
+    public void removeVertex(VertexAdapter v) {
+        this.graph.removeVertex(v.getVertex());
 
-	}
+    }
 
-	/**
-	 * Gets edge based on origin and destination vertices.
-	 * @param v1 origin vertex wrapped in VertexAdapter.
-	 * @param v2 destination vertex wrapped in VertexAdapter.
-	 * @return edge wrapped in EdgeAdapter.
-	 */
-	public EdgeAdapter getEdge(VertexAdapter v1, VertexAdapter v2) {
-		for (Edge e : v1.getVertex().getEdges(Direction.OUT, "1")) {
-			if (e.getVertex(Direction.IN).equals(v2.getVertex()))
-				return new EdgeAdapter(e);
-		}
-		return null;
-	}
+    /**
+     * Gets edge based on origin and destination vertices.
+     * @param v1 origin vertex wrapped in VertexAdapter.
+     * @param v2 destination vertex wrapped in VertexAdapter.
+     * @return edge wrapped in EdgeAdapter.
+     */
+    public EdgeAdapter getEdge(VertexAdapter v1, VertexAdapter v2) {
+        for (Edge e : v1.getVertex().getEdges(Direction.OUT, "1")) {
+            if (e.getVertex(Direction.IN).equals(v2.getVertex()))
+                return new EdgeAdapter(e);
+        }
+        return null;
+    }
 
-	/**
-	 * Removes edge from a model.
-	 * @param e edge to be removed wrapped in EdgeAdapter.
-	 */
-	public void removeEdge(EdgeAdapter e) {
-		graph.removeEdge(e.getEdge());
+    /**
+     * Removes edge from a model.
+     * @param e edge to be removed wrapped in EdgeAdapter.
+     */
+    public void removeEdge(EdgeAdapter e) {
+        this.graph.removeEdge(e.getEdge());
 
-	}
+    }
 
-	/**
-	 * Reads graphml formatted graph from a file.
-	 * @param f File with a graph definition.
-	 * @throws IOException
-	 */
-	public void read(File f) throws IOException {
-		GraphMLReader reader = new GraphMLReader(graph);
-		InputStream is = new BufferedInputStream(new FileInputStream(f));
-		reader.inputGraph(is);
-		vId = getMaxVertexId() + 1;
-		eId = getMaxEdgeId() + 1;
-	}
+    /**
+     * Reads graphml formatted graph from a file.
+     * @param f File with a graph definition.
+     * @throws IOException
+     */
+    public void read(File f) throws IOException {
+        GraphMLReader reader = new GraphMLReader(this.graph);
+        InputStream is = new BufferedInputStream(new FileInputStream(f));
+        reader.inputGraph(is);
 
-	private int getMaxEdgeId() {
-		int max = 1;
-		for (Edge e : graph.getEdges()) {
-			max = Integer.parseInt(e.getId().toString()) > max ? Integer.parseInt(e.getId().toString()) : max;
-		}
-		return max;
-	}
+        if (!this.checkVerticesCoords()) {
+            throw new IOException("Missing positional attributes for some of the vertices.");
+        }
 
-	private int getMaxVertexId() {
-		int max = 1;
-		for (Vertex v : graph.getVertices()) {
-			max = Integer.parseInt(v.getId().toString()) > max ? Integer.parseInt(v.getId().toString()) : max;
-		}
-		return max;
-	}
+        if (!this.checkEdgesProperties()) {
+            throw new IOException("Missing weight property on some edge.");
+        }
 
-	/**
-	 * Writes graph as graphml formated file.
-	 * @param f Output file.
-	 * @throws IOException
-	 */
-	public void write(File f) throws IOException {
-		GraphMLWriter writer = new GraphMLWriter(graph);
-		writer.outputGraph(f.getAbsolutePath());
+        this.vId = this.getMaxVertexId() + 1;
+        this.eId = this.getMaxEdgeId() + 1;
+    }
 
-	}
+    private boolean checkVerticesCoords() {
+        for (Vertex v : this.graph.getVertices()) {
+            if (v.getProperty("PositionX") == null || v.getProperty("PositionY") == null) {
+                return false;
+            }
+        }
 
-	/**
-	 * Gets all objects ready in graph ready to be painted.
-	 * TODO should this be here?
-	 * @return list of canvas objects.
-	 */
-	public List<CanvasObject> getAll() {
-		List<CanvasObject> o = new ArrayList<CanvasObject>();
-		for (VertexAdapter v : getVertices()) {
-			o.add(v);
-		}
-		for (EdgeAdapter e : getEdges()) {
-			int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
-			int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
-			int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
-			int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
-			e.setPoints(new Point(x1,y1), new Point(x2,y2));
-			e.setLabel(e.getEdge().getProperty("weight").toString());
-			o.add(e);
-		}
-		return o;
-	}
+        return true;
+    }
 
-	public Graph getGraph() {
-		return graph;
-	}
+    private boolean checkEdgesProperties() {
+        for (Edge e : this.graph.getEdges()) {
+            if (e.getProperty("weight") == null) {
+                return false;
+            }
+        }
+        this.recomputeEdgesCoords();
+        return true;
+    }
 
-	/**
-	 * Tries to recompute missing edges coordinates.
-	 */
-	public void recomputeEdgesCoords() {
-		for(EdgeAdapter e : getEdges()) {
-			e.setPoints(e.getOutVertex(),e.getInVertex());
-		}
+    private int getMaxEdgeId() {
+        int max = 1;
+        for (Edge e : this.graph.getEdges()) {
+            max = Integer.parseInt(e.getId().toString()) > max ? Integer.parseInt(e.getId().toString()) : max;
+        }
+        return max;
+    }
 
-	}
+    private int getMaxVertexId() {
+        int max = 1;
+        for (Vertex v : this.graph.getVertices()) {
+            max = Integer.parseInt(v.getId().toString()) > max ? Integer.parseInt(v.getId().toString()) : max;
+        }
+        return max;
+    }
 
-	/**
-	 * Gets all edges from model.
-	 * @return list of edges wrapped in EdgeAdapter.
-	 */
-	public List<EdgeAdapter> getEdges() {
-		List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
-		for(Edge e : graph.getEdges()) {
-			edges.add(new EdgeAdapter(e));
-		}
-		return edges;
-	}
+    /**
+     * Writes graph as graphml formated file.
+     * @param f Output file.
+     * @throws IOException
+     */
+    public void write(File f) throws IOException {
+        GraphMLWriter writer = new GraphMLWriter(this.graph);
+        writer.outputGraph(f.getAbsolutePath());
+
+    }
+
+    /**
+     * Gets all objects ready in graph ready to be painted.
+     * TODO should this be here?
+     * @return list of canvas objects.
+     */
+    public List<CanvasObject> getAll() {
+        List<CanvasObject> o = new ArrayList<CanvasObject>();
+        for (VertexAdapter v : this.getVertices()) {
+            o.add(v);
+        }
+        for (EdgeAdapter e : this.getEdges()) {
+            int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
+            int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
+            int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
+            int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
+            e.setPoints(new Point(x1,y1), new Point(x2,y2),
+                    e.getEdge().getVertex(Direction.IN).equals(e.getEdge().getVertex(Direction.OUT)));
+            e.setLabel(e.getEdge().getProperty("weight").toString());
+            o.add(e);
+        }
+        return o;
+    }
+
+    public Graph getGraph() {
+        return this.graph;
+    }
+
+    /**
+     * Tries to recompute missing edges coordinates.
+     */
+    public void recomputeEdgesCoords() {
+        for(EdgeAdapter e : this.getEdges()) {
+            if (e.getEdge().getProperty("startX") == null
+                    || e.getEdge().getProperty("startY") == null
+                    || e.getEdge().getProperty("endX") == null
+                    || e.getEdge().getProperty("startY") == null) {
+                e.setPoints(e.getOutVertex(),e.getInVertex());
+            }
+        }
+
+    }
+
+    /**
+     * Gets all edges from model.
+     * @return list of edges wrapped in EdgeAdapter.
+     */
+    public List<EdgeAdapter> getEdges() {
+        List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
+        for(Edge e : this.graph.getEdges()) {
+            edges.add(new EdgeAdapter(e));
+        }
+        return edges;
+    }
 }

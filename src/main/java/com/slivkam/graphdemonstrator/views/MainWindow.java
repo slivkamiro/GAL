@@ -12,64 +12,64 @@ import com.google.inject.Injector;
 import com.slivkam.graphdemonstrator.ViewsModule;
 
 public class MainWindow extends JApplet {
-	public MainWindow() {
-	}
+    public MainWindow() {
+    }
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private GraphDemonstratorView demoView;
-	
-	public JMenuItem mntmOpen;
-	public JMenuItem mntmSave;
-	public JMenu mnFile;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	
-	/*
-	 * Entry point.
-	 * (non-Javadoc)
-	 * @see java.applet.Applet#init()
-	 */
-	@Override
-	public void init() {
+    private GraphDemonstratorView demoView;
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			
-			Injector injector = Guice.createInjector(new ViewsModule());
-						
-			this.demoView = injector.getInstance(GraphDemonstratorView.class);
-			
-			SwingUtilities.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					initComponents();
-				}
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("createGUI didn't complete successfully");
-		}
-	}
+    public JMenuItem mntmOpen;
+    public JMenuItem mntmSave;
+    public JMenu mnFile;
 
-	private void initComponents() {
 
-		// initialization
+    /*
+     * Entry point.
+     * (non-Javadoc)
+     * @see java.applet.Applet#init()
+     */
+    @Override
+    public void init() {
 
-		// menu
-		JMenuBar menuBar = new JMenuBar();
-		mnFile = new JMenu("File");
-		mntmOpen = new JMenuItem("Open");
-		mntmSave = new JMenuItem("Save");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		menuBar.add(mnFile);
-		mnFile.add(mntmOpen);
-		mnFile.add(mntmSave);
-		this.setJMenuBar(menuBar);
-		
-		this.demoView.initComponents(this);
-		
-	}
+            Injector injector = Guice.createInjector(new ViewsModule());
+
+            this.demoView = injector.getInstance(GraphDemonstratorView.class);
+
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    MainWindow.this.initComponents();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("createGUI didn't complete successfully");
+        }
+    }
+
+    private void initComponents() {
+
+        // initialization
+
+        // menu
+        JMenuBar menuBar = new JMenuBar();
+        this.mnFile = new JMenu("File");
+        this.mntmOpen = new JMenuItem("Open");
+        this.mntmSave = new JMenuItem("Save");
+
+        menuBar.add(this.mnFile);
+        this.mnFile.add(this.mntmOpen);
+        this.mnFile.add(this.mntmSave);
+        this.setJMenuBar(menuBar);
+
+        this.demoView.initComponents(this);
+
+    }
 }

@@ -10,21 +10,21 @@ import com.slivkam.graphdemonstrator.views.GraphDemonstratorView;
 
 public class ViewsModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		
-		bind(GraphEditor.class).to(GraphDemonstratorView.class);
-		
-		bind(Demonstrator.class).to(GraphDemonstratorView.class);
-		
-		install(new FactoryModuleBuilder()
-				.build(PresenterFactory.class));
-		
-	}
-	
-	@Provides
-	public GraphDemonstratorView providesGraphDemonstratorView(PresenterFactory presenterFactory) {
-		return new GraphDemonstratorView(presenterFactory);
-	}
+    @Override
+    protected void configure() {
+
+        this.bind(GraphEditor.class).to(GraphDemonstratorView.class);
+
+        this.bind(Demonstrator.class).to(GraphDemonstratorView.class);
+
+        this.install(new FactoryModuleBuilder()
+                .build(PresenterFactory.class));
+
+    }
+
+    @Provides
+    public GraphDemonstratorView providesGraphDemonstratorView(PresenterFactory presenterFactory) {
+        return new GraphDemonstratorView(presenterFactory);
+    }
 
 }
