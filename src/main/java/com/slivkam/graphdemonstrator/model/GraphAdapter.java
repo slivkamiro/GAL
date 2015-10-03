@@ -1,5 +1,6 @@
 package com.slivkam.graphdemonstrator.model;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -31,13 +32,14 @@ public class GraphAdapter{
     private Integer vId;
     private Integer eId;
 
+    private List<Integer> highlightedVertices = null;
+    private List<Integer> highlightedEdges = null;
+
     /**
      * Create whole new graph in model.
      */
     public GraphAdapter() {
-        this.vId = 1;
-        this.eId = 1;
-        this.graph = new TinkerGraph();
+        this(new TinkerGraph());
     }
 
     /**
@@ -48,6 +50,17 @@ public class GraphAdapter{
         this.graph = g;
         this.vId = this.getMaxVertexId() + 1;
         this.eId = this.getMaxEdgeId() + 1;
+        this.highlightedVertices = new ArrayList<Integer>();
+        this.highlightedEdges = new ArrayList<Integer>();
+    }
+
+
+    public void highlightVertices(List<Integer> vIds) {
+        this.highlightedVertices = vIds;
+    }
+
+    public void highlightEdges(List<Integer> eIds) {
+        this.highlightedEdges = eIds;
     }
 
     /**
@@ -87,7 +100,11 @@ public class GraphAdapter{
     public List<VertexAdapter> getVertices() {
         List<VertexAdapter> vertices = new ArrayList<VertexAdapter>();
         for (Vertex v : this.graph.getVertices()) {
-            vertices.add(new VertexAdapter(v));
+            VertexAdapter va = new VertexAdapter(v);
+            if (this.highlightedVertices.contains(Integer.valueOf(va.getId()))) {
+                va.setColor(Color.RED);
+            }
+            vertices.add(va);
         }
         return vertices;
     }
@@ -167,7 +184,7 @@ public class GraphAdapter{
     }
 
     private int getMaxEdgeId() {
-        int max = 1;
+        int max = 0;
         for (Edge e : this.graph.getEdges()) {
             max = Integer.parseInt(e.getId().toString()) > max ? Integer.parseInt(e.getId().toString()) : max;
         }
@@ -175,7 +192,7 @@ public class GraphAdapter{
     }
 
     private int getMaxVertexId() {
-        int max = 1;
+        int max = 0;
         for (Vertex v : this.graph.getVertices()) {
             max = Integer.parseInt(v.getId().toString()) > max ? Integer.parseInt(v.getId().toString()) : max;
         }
@@ -204,12 +221,6 @@ public class GraphAdapter{
             o.add(v);
         }
         for (EdgeAdapter e : this.getEdges()) {
-            //            int x1 = Integer.parseInt(e.getEdge().getProperty("startX").toString());
-            //            int y1 = Integer.parseInt(e.getEdge().getProperty("startY").toString());
-            //            int x2 = Integer.parseInt(e.getEdge().getProperty("endX").toString());
-            //            int y2 = Integer.parseInt(e.getEdge().getProperty("endY").toString());
-            //            e.setPoints(new Point(x1,y1), new Point(x2,y2),
-            //                    e.getEdge().getVertex(Direction.IN).equals(e.getEdge().getVertex(Direction.OUT)));
             e.setPoints(e.getOutVertex(),e.getInVertex());
             e.setLabel(e.getEdge().getProperty("weight").toString());
             o.add(e);
@@ -238,8 +249,30 @@ public class GraphAdapter{
     public List<EdgeAdapter> getEdges() {
         List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
         for(Edge e : this.graph.getEdges()) {
-            edges.add(new EdgeAdapter(e));
+            EdgeAdapter ea = new EdgeAdapter(e);
+            if (this.highlightedEdges.contains(Integer.valueOf(ea.getId()))) {
+                ea.setColor(Color.RED);
+            }
+            edges.add(ea);
         }
         return edges;
+    }
+
+    /**
+     *
+     * @return vertex with lowest id
+     */
+    public VertexAdapter getRootVertex() {
+        Vertex root = this.graph.getVertex(this.vId-1);
+        for (Vertex v : this.graph.getVertices()) {
+            if (Integer.valueOf((String) v.getId()) < Integer.valueOf((String) root.getId())) {
+                root = v;
+            }
+        }
+        return new VertexAdapter(root);
+    }
+
+    public VertexAdapter getVertex(Integer vId) {
+        return new VertexAdapter(this.graph.getVertex(vId));
     }
 }

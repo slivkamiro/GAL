@@ -1,6 +1,5 @@
 package com.slivkam.graphdemonstrator.swingcomponents;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
@@ -40,7 +39,7 @@ public class Circle extends CanvasObject implements Connectable{
 
     @Override
     public void drawObject(Graphics2D g2) {
-        g2.setColor(Color.BLACK);
+        g2.setColor(this.getColor());
         if (this.getShape() != null) {
             g2.draw(this.getShape());
         }

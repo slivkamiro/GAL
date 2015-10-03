@@ -98,19 +98,31 @@ public class VertexAdapter extends Circle{
         return attributes;
     }
 
-    /**
-     * Gets all edges that originate in this vertex or this vertex is it's destination.
-     * @return List of edges wrapped in EdgeAdapter.
-     */
-    public List<EdgeAdapter> getEdges() {
+    private List<EdgeAdapter> getEdges(Direction direction) {
         List<EdgeAdapter> edges = new ArrayList<EdgeAdapter>();
-        for (Edge e : this.v.getEdges(Direction.BOTH, "1")) {
+        for (Edge e : this.v.getEdges(direction, "1")) {
             EdgeAdapter ea = new EdgeAdapter(e);
             ea.setPoints(ea.getOutVertex(),ea.getInVertex());
             ea.setLabel(e.getProperty("weight"));
             edges.add(ea);
         }
         return edges;
+    }
+
+    /**
+     * Gets all edges that originate in this vertex or this vertex is it's destination.
+     * @return List of edges wrapped in EdgeAdapter.
+     */
+    public List<EdgeAdapter> getEdges() {
+        return this.getEdges(Direction.BOTH);
+    }
+
+    public List<EdgeAdapter> getOutEdges() {
+        return this.getEdges(Direction.OUT);
+    }
+
+    public List<EdgeAdapter> getInEdges() {
+        return this.getEdges(Direction.IN);
     }
 
     /**

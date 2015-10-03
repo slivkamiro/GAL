@@ -13,6 +13,15 @@ import java.awt.Shape;
 public abstract class CanvasObject {
     private Shape shape = null;
     private String label = "";
+    private Color color = Color.BLACK;
+
+    public void setColor(Color c) {
+        this.color = c;
+    }
+
+    public Color getColor() {
+        return this.color;
+    }
 
     /**
      * Method implemented here just draw shape that was set.
@@ -23,7 +32,7 @@ public abstract class CanvasObject {
     public void drawObject(Graphics2D g2) throws NullPointerException {
         // TODO default label place, now in extension classes
         // override
-        g2.setColor(Color.BLACK);
+        g2.setColor(this.color);
         if (this.shape != null)
         {
             g2.draw(this.shape);

@@ -114,6 +114,7 @@ public class DemoPresenter extends Presenter implements Observer {
             this.presentGraph = graph;
             //history.push(graph);
             this.alg.setGraph(graph);
+            this.updateEvents();
         } else {
             this.stopDemo();
         }
@@ -176,15 +177,19 @@ public class DemoPresenter extends Presenter implements Observer {
             this.presentGraph = this.alg.getGraph();
             //history.push(this.alg.getGraph());
             this.demonstrator.setGraph(this.presentGraph);
-            StringBuilder event = new StringBuilder();
-            for(String key : this.alg.getPropertiesName()) {
-                event.append(key+": ");
-                event.append(this.alg.getProperty(key)+"\n");
-            }
-            this.alg.clearProperties();
-            this.demonstrator.addEvent(event.toString());
+            this.updateEvents();
         }
 
+    }
+
+    private void updateEvents() {
+        StringBuilder event = new StringBuilder();
+        for(String key : this.alg.getPropertiesName()) {
+            event.append(key+": ");
+            event.append(this.alg.getProperty(key)+"\n");
+        }
+        this.alg.clearProperties();
+        this.demonstrator.addEvent(event.toString());
     }
 
     /**
@@ -201,7 +206,6 @@ public class DemoPresenter extends Presenter implements Observer {
             if(this.history.empty()) {
                 this.demonstrator.setGraph(this.presentGraph);
             } else {
-                // Demonstration stopped in the middle
                 this.demonstrator.setGraph(this.history.firstElement());
             }
         } else {

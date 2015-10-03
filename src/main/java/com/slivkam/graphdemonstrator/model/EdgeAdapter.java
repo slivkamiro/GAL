@@ -34,6 +34,14 @@ public class EdgeAdapter extends CurvedArrow {
     }
 
     /**
+     * Gets edge id.
+     * @return string id. Will be number.
+     */
+    public String getId() {
+        return (String) this.e.getId();
+    }
+
+    /**
      * Gets vertex from which this edge originates.
      * @return vertex adapter class.
      */

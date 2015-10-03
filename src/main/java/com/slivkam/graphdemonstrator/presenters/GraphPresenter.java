@@ -202,10 +202,10 @@ public class GraphPresenter extends Presenter {
             } else if (v != null && v.getEdges().size() != 0) {
                 for (EdgeAdapter edgeToRemove : v.getEdges()) {
                     this.graph.removeEdge(edgeToRemove);
+                    this.editor.removeObject(edgeToRemove);
                 }
                 this.graph.removeVertex(v);
-                this.editor.clean();
-                this.editor.setObjects(this.graph.getAll());
+                this.editor.removeObject(v);
                 break;
             }
             e = this.getEdgeCloseTo(point);

@@ -19,7 +19,7 @@ public abstract class Algorithm extends Observable implements Runnable {
     /**
      * Output graph variable.
      */
-    private GraphAdapter g;
+    protected GraphAdapter graph;
 
     private Map<String,String> properties;
 
@@ -92,7 +92,9 @@ public abstract class Algorithm extends Observable implements Runnable {
     @Override
     public void run() {
         this.doStep();
-        if (this.g != null) {
+        if (this.graph != null) {
+            this.graph.highlightEdges(this.edgeIds);
+            this.graph.highlightVertices(this.vertexIds);
             this.setChanged();
             this.notifyObservers();
         }
@@ -103,18 +105,15 @@ public abstract class Algorithm extends Observable implements Runnable {
      * @param g Graph to be published.
      */
     protected void setOutput(Graph g) {
-        this.setOutput(new GraphAdapter(g));
+        this.newInstanceOutput(new GraphAdapter(g));
     }
 
-    /**
-     * Sets graph to be published. This should be called when new step was executed.
-     * @param g Graph to be published.
-     */
-    protected void setOutput(GraphAdapter g) {
-        this.g = g;
-        if(this.g != null) {
-            this.g.recomputeEdgesCoords();
-        }
+    protected void endAlgorithm() {
+        this.graph = null;
+    }
+
+    private void newInstanceOutput(GraphAdapter g) {
+        this.graph = g;
     }
 
     public void highlightEdge(int edgeId) {
@@ -126,14 +125,19 @@ public abstract class Algorithm extends Observable implements Runnable {
     }
 
     public GraphAdapter getGraph() {
-        return this.g;
+        return this.graph;
     }
 
     /**
      * This method sets graph that should be algorithm performed on.
      * @param g
      */
-    public abstract void setGraph(GraphAdapter g);
+    public void setGraph(GraphAdapter g) {
+        this.graph = g;
+        this.init();
+    }
+
+    public abstract void init();
 
     /**
      * This method performs one step in algorithm.
