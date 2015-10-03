@@ -37,9 +37,7 @@ public class GraphPresenter extends Presenter {
          * Draw canvas object specified.
          * @param o
          */
-        void drawObject(CanvasObject o);
-        //public void drawShape(final Shape s);
-        //public void drawDirectedEdge(Point p1, Point p2);
+        void publishObject(CanvasObject o);
 
         /**
          * Edit canvas object specified.
@@ -57,8 +55,6 @@ public class GraphPresenter extends Presenter {
          * Remove last object painted.
          */
         void removeLast();
-        //public void removeVertexCloseTo(Point p);
-        //public void removeEdgeCloseTo(Point p);
 
         void removeObject(CanvasObject o);
 
@@ -147,7 +143,7 @@ public class GraphPresenter extends Presenter {
                 this.editor.removeLast();
                 EdgeAdapter e = this.graph.addEdge(out, in);
                 e.setPoints(out, in);
-                this.editor.drawObject(e);
+                this.editor.publishObject(e);
             }
             break;
         case VERTEX:
@@ -158,7 +154,7 @@ public class GraphPresenter extends Presenter {
             // add vertex to model
             VertexAdapter v = this.graph.addVertex(point);
             // draw vertex to canvas
-            this.editor.drawObject(v);
+            this.editor.publishObject(v);
             break;
         case EDIT:
         case REMOVE:
@@ -181,7 +177,7 @@ public class GraphPresenter extends Presenter {
             this.end = point;
             v = this.getVertexOnPosition(this.start);
             if (v == null) break;
-            this.editor.drawObject(new CurvedArrow(v,new ConnectablePoint(this.end)));
+            this.editor.publishObject(new CurvedArrow(v,new ConnectablePoint(this.end)));
             //editor.drawShape(new Line2D.Double(start, end));
             break;
         case EDIT:
@@ -280,7 +276,7 @@ public class GraphPresenter extends Presenter {
             final VertexAdapter out = this.getVertexOnPosition(this.start);
             if (out != null) {
                 this.editor.removeLast();
-                this.editor.drawObject(new CurvedArrow(out,new ConnectablePoint(this.end)) );
+                this.editor.publishObject(new CurvedArrow(out,new ConnectablePoint(this.end)) );
             }
             break;
         case EDIT:
@@ -292,10 +288,10 @@ public class GraphPresenter extends Presenter {
             this.editor.removeObject(v);
             v.setAttribute("PositionX", String.valueOf(point.x));
             v.setAttribute("PositionY", String.valueOf(point.y));
-            this.editor.drawObject(v);
+            this.editor.publishObject(v);
             for (EdgeAdapter e : v.getEdges()) {
                 this.editor.removeObject(e);
-                this.editor.drawObject(e);
+                this.editor.publishObject(e);
             }
             this.movingVertexPosition = point;
         case NONE:

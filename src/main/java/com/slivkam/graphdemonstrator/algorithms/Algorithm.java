@@ -16,119 +16,128 @@ import com.tinkerpop.blueprints.Graph;
  */
 public abstract class Algorithm extends Observable implements Runnable {
 
-	/**
-	 * Output graph variable.
-	 */
-	private GraphAdapter g;
+    /**
+     * Output graph variable.
+     */
+    private GraphAdapter g;
 
-	private Map<String,String> properties;
+    private Map<String,String> properties;
 
-	/**
-	 * Default constructor.
-	 */
-	public Algorithm() {
-		properties = new HashMap<String,String>();
-	}
+    private List<Integer> edgeIds;
 
-	/**
-	 * Adding some property that algorithm wants to be published alongside with graph.
-	 * @param name Property name.
-	 * @param value Property value.
-	 */
-	protected void addProperty(String name, String value) {
-		properties.put(name, value);
-	}
+    private List<Integer> vertexIds;
 
-	/**
-	 * Retrieve property by name.
-	 * @param name Name of the property.
-	 * @return Property value.
-	 */
-	public String getProperty(String name) {
-		return properties.get(name);
-	}
+    /**
+     * Default constructor.
+     */
+    public Algorithm() {
+        this.properties = new HashMap<String,String>();
+        this.edgeIds = new ArrayList<Integer>();
+        this.vertexIds = new ArrayList<Integer>();
+    }
 
-	/**
-	 * Check if property with a name given exists.
-	 * @param name Name of the property.
-	 * @return true if property exists, false otherwise.
-	 */
-	public boolean propertyExists(String name) {
-		return properties.containsKey(name);
-	}
+    /**
+     * Adding some property that algorithm wants to be published alongside with graph.
+     * @param name Property name.
+     * @param value Property value.
+     */
+    protected void addProperty(String name, String value) {
+        this.properties.put(name, value);
+    }
 
-	/**
-	 * Gets names of all properties.
-	 * @return List of names.
-	 */
-	public List<String> getPropertiesName() {
-		return new ArrayList<String>(properties.keySet());
-	}
+    /**
+     * Retrieve property by name.
+     * @param name Name of the property.
+     * @return Property value.
+     */
+    public String getProperty(String name) {
+        return this.properties.get(name);
+    }
 
-	/**
-	 * Gets values of all properties.
-	 * @return List of values.
-	 */
-	public List<String> getPropertiesValue() {
-		return new ArrayList<String>(properties.values());
-	}
+    /**
+     * Check if property with a name given exists.
+     * @param name Name of the property.
+     * @return true if property exists, false otherwise.
+     */
+    public boolean propertyExists(String name) {
+        return this.properties.containsKey(name);
+    }
 
-	/**
-	 * Remove all properties. Names and values.
-	 */
-	public void clearProperties() {
-		properties.clear();
-	}
+    /**
+     * Gets names of all properties.
+     * @return List of names.
+     */
+    public List<String> getPropertiesName() {
+        return new ArrayList<String>(this.properties.keySet());
+    }
 
-	/**
-	 * This is called by executor.
-	 */
-	@Override
-	public void run() {
-		doStep();
-		if (g != null) {
-			setChanged();
-			notifyObservers();
-		}
-	}
+    /**
+     * Gets values of all properties.
+     * @return List of values.
+     */
+    public List<String> getPropertiesValue() {
+        return new ArrayList<String>(this.properties.values());
+    }
 
-	/**
-	 * Sets graph to be published. This should be called when new step was executed.
-	 * @param g Graph to be published.
-	 */
-	protected void setOutput(Graph g) {
-		if(g != null) {
-			this.g = new GraphAdapter(g);
-			this.g.recomputeEdgesCoords();
-		} else {
-			this.g = null;
-		}
-	}
+    /**
+     * Remove all properties. Names and values.
+     */
+    public void clearProperties() {
+        this.properties.clear();
+    }
 
-	/**
-	 * Sets graph to be published. This should be called when new step was executed.
-	 * @param g Graph to be published.
-	 */
-	protected void setOutput(GraphAdapter g) {
-		this.g = g;
-		if(this.g != null) {
-			this.g.recomputeEdgesCoords();
-		}
-	}
+    /**
+     * This is called by executor.
+     */
+    @Override
+    public void run() {
+        this.doStep();
+        if (this.g != null) {
+            this.setChanged();
+            this.notifyObservers();
+        }
+    }
 
-	public GraphAdapter getGraph() {
-		return g;
-	}
+    /**
+     * Sets graph to be published. This should be called when new step was executed.
+     * @param g Graph to be published.
+     */
+    protected void setOutput(Graph g) {
+        this.setOutput(new GraphAdapter(g));
+    }
 
-	/**
-	 * This method sets graph that should be algorithm performed on.
-	 * @param g
-	 */
-	public abstract void setGraph(GraphAdapter g);
+    /**
+     * Sets graph to be published. This should be called when new step was executed.
+     * @param g Graph to be published.
+     */
+    protected void setOutput(GraphAdapter g) {
+        this.g = g;
+        if(this.g != null) {
+            this.g.recomputeEdgesCoords();
+        }
+    }
 
-	/**
-	 * This method performs one step in algorithm.
-	 * In this method should be set new output graph.
-	 */
-	protected abstract void doStep();
+    public void highlightEdge(int edgeId) {
+        this.edgeIds.add(edgeId);
+    }
+
+    public void highlightVertex(int vertexId) {
+        this.vertexIds.add(vertexId);
+    }
+
+    public GraphAdapter getGraph() {
+        return this.g;
+    }
+
+    /**
+     * This method sets graph that should be algorithm performed on.
+     * @param g
+     */
+    public abstract void setGraph(GraphAdapter g);
+
+    /**
+     * This method performs one step in algorithm.
+     * In this method should be set new output graph.
+     */
+    protected abstract void doStep();
 }

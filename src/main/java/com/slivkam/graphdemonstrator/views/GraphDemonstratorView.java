@@ -102,7 +102,7 @@ public class GraphDemonstratorView implements Demonstrator, GraphEditor, CanvasC
     }
 
     @Override
-    public void drawObject(CanvasObject o) {
+    public void publishObject(CanvasObject o) {
         this.canvas.drawObject(o);
 
     }
