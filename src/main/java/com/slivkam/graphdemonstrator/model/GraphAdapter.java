@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.slivkam.graphdemonstrator.swingcomponents.CanvasObject;
@@ -42,6 +43,10 @@ public class GraphAdapter{
         this(new TinkerGraph());
     }
 
+    public GraphAdapter(GraphAdapter g) {
+        this(g.getGraph());
+    }
+
     /**
      * Takes already created graph in model and uses it as initialization.
      * @param g model graph.
@@ -55,12 +60,12 @@ public class GraphAdapter{
     }
 
 
-    public void highlightVertices(List<Integer> vIds) {
-        this.highlightedVertices = vIds;
+    public void highlightVertices(Integer[] vIds) {
+        this.highlightedVertices = Arrays.asList(vIds);
     }
 
-    public void highlightEdges(List<Integer> eIds) {
-        this.highlightedEdges = eIds;
+    public void highlightEdges(Integer[] eIds) {
+        this.highlightedEdges = Arrays.asList(eIds);
     }
 
     /**

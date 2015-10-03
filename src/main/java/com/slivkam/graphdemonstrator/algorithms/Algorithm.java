@@ -1,7 +1,7 @@
 package com.slivkam.graphdemonstrator.algorithms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -31,7 +31,7 @@ public abstract class Algorithm extends Observable implements Runnable {
      * Default constructor.
      */
     public Algorithm() {
-        this.properties = new HashMap<String,String>();
+        this.properties = new LinkedHashMap<String,String>();
         this.edgeIds = new ArrayList<Integer>();
         this.vertexIds = new ArrayList<Integer>();
     }
@@ -93,18 +93,20 @@ public abstract class Algorithm extends Observable implements Runnable {
     public void run() {
         this.doStep();
         if (this.graph != null) {
-            this.graph.highlightEdges(this.edgeIds);
-            this.graph.highlightVertices(this.vertexIds);
             this.setChanged();
             this.notifyObservers();
         }
+    }
+
+    protected void addToHistory(GraphAdapter g) {
+        this.newInstanceOutput(new GraphAdapter(g));
     }
 
     /**
      * Sets graph to be published. This should be called when new step was executed.
      * @param g Graph to be published.
      */
-    protected void setOutput(Graph g) {
+    protected void addToHistory(Graph g) {
         this.newInstanceOutput(new GraphAdapter(g));
     }
 
@@ -114,6 +116,8 @@ public abstract class Algorithm extends Observable implements Runnable {
 
     private void newInstanceOutput(GraphAdapter g) {
         this.graph = g;
+        this.graph.highlightEdges(this.edgeIds.toArray(new Integer[0]));
+        this.graph.highlightVertices(this.vertexIds.toArray(new Integer[0]));
     }
 
     public void highlightEdge(int edgeId) {

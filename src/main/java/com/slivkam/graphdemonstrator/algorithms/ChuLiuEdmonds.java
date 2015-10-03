@@ -141,7 +141,7 @@ public class ChuLiuEdmonds extends Algorithm {
     public void doStep() {
 
         if (this.doneFlag){
-            this.setOutput((Graph)null);
+            this.endAlgorithm();
             return;
         }
 
@@ -758,7 +758,7 @@ public class ChuLiuEdmonds extends Algorithm {
     public void publishSubGraph(){
 
         if (this.doneFlag){
-            this.setOutput((Graph)null);
+            this.endAlgorithm();
             return;
         }
 
@@ -846,7 +846,7 @@ public class ChuLiuEdmonds extends Algorithm {
         this.addProperty("V", sV);
         this.addProperty("BV", sBV);
         this.addProperty("BE", sBE);
-        this.setOutput(g);
+        this.addToHistory(g);
 
         //System.out.println("SETS:\nV: "+sV+"\nBV: "+sBV+"\nBE: "+sBE + "\nC: "+sC);
     }
